@@ -1,0 +1,104 @@
+---
+# This playbook will install the newest version of docker-ce
+
+- name: "Remove old docker packages (if any)"
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+      - docker
+      - docker-engine
+      - docker.io
+
+- name: "Update apt repo"
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - nfs-common
+
+- name: "Add Official Docker GPG key to apt-key"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: "Add the repository to apt"
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: "Install the docker-ce and pip packages"
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+        #- python-pip
+
+  #- name: "Install docker-py to be managed by ansible"
+  #pip:
+  #  name: docker-py
+
+- name: Create new group to run docker containers with
+  group:
+    name: docks
+    gid: 1100
+    state: present
+
+- name: Create new user to run docker containers with
+  user: 
+    name: docks
+    state: present
+    uid: 1100
+    groups: 
+      - docks
+      - docker
+
+
+- name: "Add deployer user to docker group"
+  user:
+    name: deployer
+    append: yes
+    groups:
+      - docker
+      - docks
+
+- name: "Copy docker daemon.json"
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    group: docker
+    mode: 0644
+
+- name: "Copy docker overrides"
+  copy:
+    src: startup_options.conf
+    dest: /etc/systemd/system/docker.service.d/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Restart docker daemon"
+  service:
+    name: docker
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+
+    #- name: "Update systemlimits for elasticsearch"
+    #  ansible.posix.sysctl:
+    #name: vm.max_map_count
+    #value: "262144"
+    #sysctl_set: yes
+  

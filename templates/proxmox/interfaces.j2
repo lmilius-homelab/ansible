@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+auto lo
+iface lo inet loopback
+
+allow-hotplug {{ interface_name }}
+iface {{ interface_name }} inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+    address {{ host_ip }}
+    gateway {{ gateway_ip }}
+    bridge_ports {{ interface_name }}
+    bridge_stp off
+    bridge_fd 0

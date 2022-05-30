@@ -1,0 +1,6 @@
+- src: geerlingguy.docker
+- src: ironicbadger.proxmox_nag_removal
+- src: geerlingguy.ntp
+- src: lae.proxmox
+- src: mrlesmithjr.zfs
+# - src: nununo.proxmox-haos-install

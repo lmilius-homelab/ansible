@@ -1,0 +1,25 @@
+# Creates a new user, permissions to allow sudo use, and copies SSH key to remote system
+
+---
+  - name: Create new user without password
+    user: name=deployer state=present createhome=yes shell=/bin/bash
+
+  # - name: Set deployer user as sudo, no password
+  #   lineinfile:
+  #     name: /etc/sudoers
+  #     state: present
+  #     regexp: '^deployer'
+  #     line: 'deployer ALL=(ALL) NOPASSWD: ALL'
+  #     validate: 'visudo -cf %s'
+
+  - name: sudo without password for deployer user
+    copy:
+      content: 'deployer ALL=(ALL) NOPASSWD: ALL'
+      dest: /etc/sudoers.d/ansible_deployer
+      mode: 0440
+
+  - name: copy public ssh key from current user to remote deployer user
+    authorized_key:
+      user: deployer
+      state: present
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

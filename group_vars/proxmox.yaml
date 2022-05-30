@@ -1,0 +1,10 @@
+---
+ansible_host: "{{ vault_proxmox_host_ip }}"
+interface_name: eno1
+interfaces_template: "proxmox/interfaces.j2"
+proxmox_pass: "{{ vault_proxmox_pass }}"
+host_ip: "{{ ansible_host }}/24"
+gateway_ip: "{{ vault_gateway_ip }}"
+domain_name: "{{ vault_domain_name }}"
+nas_ip: "{{ vault_nas_ip }}"
+nfs_iso_export: "{{ vault_nfs_iso_export }}"
