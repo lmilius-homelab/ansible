@@ -3,4 +3,9 @@
 - src: geerlingguy.ntp
 - src: lae.proxmox
 - src: mrlesmithjr.zfs
-# - src: nununo.proxmox-haos-install
+- src: nununo.proxmox_haos_install
+- src: grog.package
+- src: rossmcdonald.telegraf
+- src: ironicbadger.bash_aliases
+- src: ironicbadger.hddtemp
+- src: ironicbadger.docker_compose_generator

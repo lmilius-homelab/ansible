@@ -2,4 +2,4 @@
 - hosts: homeassistant
   vars_files: vault.yaml
   roles:
-  - role: nununo.proxmox-haos-install
+  - role: nununo.proxmox_haos_install

@@ -42,12 +42,26 @@
       pve_run_system_upgrades: true
       pve_run_proxmox_upgrades: true
       pve_storages:
-        - name: nfs1
+        - name: isos
           type: nfs
           content: [ "vztmpl", "iso" ]
           server: "{{ nas_ip }}"
           export: "{{ nfs_iso_export }}"
+          state: "present"
+        - name: pve_data
+          type: nfs
+          content: [ "images", "backup", "snippets", "rootdir" ]
+          server: "{{ nas_ip }}"
+          export: "{{ nfs_pvedata_export }}"
+          state: "present"
     - role: geerlingguy.docker
       vars:
         docker_users:
           - deployer
+    - role: docker-config
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: rossmcdonald.telegraf
+    - role: ironicbadger.hddtemp

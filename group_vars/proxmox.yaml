@@ -8,3 +8,57 @@ gateway_ip: "{{ vault_gateway_ip }}"
 domain_name: "{{ vault_domain_name }}"
 nas_ip: "{{ vault_nas_ip }}"
 nfs_iso_export: "{{ vault_nfs_iso_export }}"
+nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
+
+influxdb_ip: 127.0.0.1
+
+telegraf_plugins_base:
+  - name: mem
+  - name: system
+  - name: cpu
+    options:
+      percpu: "true"
+      totalcpu: "true"
+      collect_cpu_time: "false"
+      report_active: "false"
+  - name: disk
+    options:
+      ignore_fs:
+        - "tmpfs"
+        - "devtmpfs"
+        - "devfs"
+      mountpoints:
+        - "/"
+  - name: diskio
+    options:
+      skip_serial_number: "true"
+  - name: kernel
+  - name: processes
+  - name: docker
+    options:
+      endpoint: "unix:///var/run/docker.sock"
+      perdevice: "true"
+  - name: hddtemp
+  - name: net
+    options:
+      interfaces:
+        - "ens192"
+        - "eno1"
+  # - name: sensors
+
+# ironicbadger.docker_compose_generator
+appdata_path: /mnt/pve/pvedata/appdata
+# download_path: /mnt/nvme2tb/downloads
+# storage_path: /mnt/storage
+# local_domain: "wd.{{ domain_me }}"
+
+containers:
+  ###
+  - service_name: influxdb
+    active: true
+    image: influxdb:1.8
+    volumes:
+      - "{{ appdata_path }}/influxdb:/config"
+    ports:
+      - 8086:8086
+    restart: unless-stopped
