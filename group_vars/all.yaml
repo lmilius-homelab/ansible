@@ -6,22 +6,26 @@ main_uid: "1100"
 main_gid: "1100"
 
 # https://github.com/ironicbadger/infra/blob/master/group_vars/all.yaml
-# ferrarimarco.bash-aliases
+# ironicbadger.bash_aliases
 bash_aliases:
   - { alias: "dcp", command: "docker-compose "}
   - { alias: "dlog", command: "docker logs -f "}
-  - { alias: "ctop", command: "docker run --name ctop  -it --rm -v /var/run/docker.sock:/var/run/docker.sock quay.io/vektorlab/ctop "}
+  - { alias: "dtop", command: "docker run --name ctop  -it --rm -v /var/run/docker.sock:/var/run/docker.sock quay.io/vektorlab/ctop "}
+  - { alias: "hdtemp", command: "sudo hddtemp /dev/sd[a,b,c,d,e,f,g,h,i,j,k,l,m,n]"}
 
 # grog.package
 package_list:
 - name: curl
 - name: git
+- name: hddtemp
+- name: parted
 - name: htop
 - name: iftop
 - name: iotop
+- name: lm-sensors
 - name: net-tools
 - name: openssh-server
-- name: python
+- name: python3
 - name: tmux
 - name: sudo
 - name: wget

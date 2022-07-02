@@ -10,8 +10,34 @@ nas_ip: "{{ vault_nas_ip }}"
 nfs_iso_export: "{{ vault_nfs_iso_export }}"
 nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
 
+# influxdb
 influxdb_ip: 127.0.0.1
 
+# grog.package
+package_list:
+- name: curl
+- name: git
+- name: hddtemp
+- name: parted
+- name: htop
+- name: iftop
+- name: iotop
+- name: lm-sensors
+- name: net-tools
+- name: openssh-server
+- name: python3
+- name: tmux
+- name: sudo
+- name: wget
+- name: tree
+- name: smartmontools
+- name: nmap
+- name: intel-gpu-tools
+- name: nfs-kernel-server
+- name: zfsutils-linux
+- name: ffmpeg
+
+## telegraf
 telegraf_plugins_base:
   - name: mem
   - name: system
@@ -44,13 +70,13 @@ telegraf_plugins_base:
       interfaces:
         - "ens192"
         - "eno1"
-  # - name: sensors
+  - name: sensors
 
 # ironicbadger.docker_compose_generator
 appdata_path: /mnt/pve/pvedata/appdata
 # download_path: /mnt/nvme2tb/downloads
-# storage_path: /mnt/storage
-# local_domain: "wd.{{ domain_me }}"
+storage_path: /mnt/storage
+local_domain: "{{ vault_domain_name }}"
 
 containers:
   ###
@@ -61,4 +87,52 @@ containers:
       - "{{ appdata_path }}/influxdb:/config"
     ports:
       - 8086:8086
+    restart: unless-stopped
+  ###
+  - service_name: librespeed
+    active: true
+    image: linuxserver/librespeed
+    ports:
+      - 8080:80
+    # labels:
+    #   - traefik.enable=true
+    #   - "traefik.http.routers.librespeed.rule=Host(`speed.m.{{ local_domain }}`)"
+    environment:
+      - MODE=standalone
+      - TELEMETRY=true
+      # - "PASSWORD={{ librespeed_password }}"
+    include_global_env_vars: true
+    restart: unless-stopped
+  ###
+  - service_name: filebrowser
+    active: true
+    image: filebrowser/filebrowser:s6
+    ports:
+      - 8081:80
+    # labels:
+    #   - traefik.enable=true
+    #   - "traefik.http.routers.fb.rule=Host(`files.m.{{ local_domain }}`)"
+    volumes:
+      - "{{ storage_path }}:/srv"
+      - "{{ appdata_path }}/filebrowser/db:/database.db"
+      - "{{ appdata_path }}/filebrowser/filebrowser.json:/.filebrowser.json"
+    include_global_env_vars: true
+    restart: unless-stopped
+  ###
+  - service_name: jellyfin
+    active: true
+    image: jellyfin/jellyfin
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
+    # labels:
+    #   - traefik.enable=true
+    #   - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.m.{{ local_domain }}`)"
+    #   - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    volumes:
+      - "{{ appdata_path }}/jellyfin:/config"
+      - "{{ storage_path }}:/data"
+    environment:
+      - "JELLYFIN_PublishedServerUrl=emma-pc.{{ local_domain }}"
+    include_global_env_vars: true
     restart: unless-stopped

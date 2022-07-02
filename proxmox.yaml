@@ -58,10 +58,13 @@
       vars:
         docker_users:
           - deployer
-    - role: docker-config
+    - role: docker_config
     - role: ironicbadger.bash_aliases
     - role: grog.package
     - role: ironicbadger.docker_compose_generator
       tags: compose
+    - role: docker_compose_up
+      tags: compose
     - role: rossmcdonald.telegraf
     - role: ironicbadger.hddtemp
+    
