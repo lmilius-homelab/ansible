@@ -4,6 +4,12 @@
   - name: Create new user without password
     user: name=deployer state=present createhome=yes shell=/bin/bash
 
+  - name: "Install sudo"
+    apt: 
+      name: "sudo"
+      state: present
+      update_cache: yes
+
   # - name: Set deployer user as sudo, no password
   #   lineinfile:
   #     name: /etc/sudoers
