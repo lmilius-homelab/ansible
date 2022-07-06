@@ -9,3 +9,4 @@
 - src: ironicbadger.bash_aliases
 - src: ironicbadger.hddtemp
 - src: ironicbadger.docker_compose_generator
+- src: ironicbadger.apprise_boot_notification

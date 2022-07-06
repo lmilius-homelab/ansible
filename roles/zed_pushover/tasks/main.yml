@@ -1,0 +1,10 @@
+---
+- name: Configure zed daemon
+  template: 
+    src: zed.rc.j2
+    dest: '/etc/zfs/zed.d/zed.rc'
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart zed
+  

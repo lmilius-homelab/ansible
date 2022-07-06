@@ -4,6 +4,9 @@ ansible_user: deployer
 become: true
 main_uid: "1100"
 main_gid: "1100"
+pushover_user_key: "{{ vault_pushover_user_key }}"
+pushover_api_bootlace: "{{ vault_pushover_token }}"
+pushover_token: "{{ vault_pushover_token }}"
 
 # https://github.com/ironicbadger/infra/blob/master/group_vars/all.yaml
 # ironicbadger.bash_aliases

@@ -66,5 +66,8 @@
     - role: docker_compose_up
       tags: compose
     - role: rossmcdonald.telegraf
+    - role: zed_pushover
     - role: ironicbadger.hddtemp
+    - role: ironicbadger.proxmox_nag_removal
+    - role: ironicbadger.apprise_boot_notification
     
