@@ -1,0 +1,25 @@
+---
+
+- name: ensure python pip is available
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
+
+- name: install apprise
+  ansible.builtin.pip:
+    name: apprise
+  become: true
+
+- name: install script that cron will execute
+  ansible.builtin.template:
+    src: hd.sh.j2
+    dest: /root/hd.sh
+    owner: root
+    group: root
+    mode: '700'
+
+- name: install boot notification script
+  ansible.builtin.cron:
+    name: "hard drive temp alerts"
+    minute: "*/30"
+    job: /bin/bash /root/hd.sh

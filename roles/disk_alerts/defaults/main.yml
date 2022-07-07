@@ -1,0 +1,3 @@
+---
+apprise_path: "/usr/bin/apprise"
+hd_alert_temp: 45

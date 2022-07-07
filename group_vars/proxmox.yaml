@@ -12,6 +12,9 @@ nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
 init_admin_pass: "{{ vault_init_admin_password }}"
 photoprism_db_password: "{{ vault_photoprism_db_password }}"
 
+# apprise
+apprise_path: /usr/local/bin/apprise
+
 # influxdb
 influxdb_ip: 127.0.0.1
 

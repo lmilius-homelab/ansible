@@ -1,0 +1,21 @@
+#!/bin/bash
+
+CRIT_TEMP_LEVEL={{ hd_alert_temp }}
+
+t=($(hddtemp /dev/sd[a,b,c,d,e,f,g,h,i,j,k,l,m,n] --numeric))
+
+temp_high=False
+
+temp_str=$(echo "${t[@]}")
+
+for element in "${t[@]}"
+do
+    if  (( $element > $CRIT_TEMP_LEVEL )); then
+        temp_high=True
+        break
+    fi
+done
+
+if [ "$temp_high" == "True" ]; then
+    {{ apprise_path }} -t "{{ ansible_hostname }} high disk temp!" -b "{{ ansible_hostname }} has a disk that is running hot. Current values: $temp_str." pover://{{ pushover_user_key }}@{{ pushover_api_bootlace }}
+fi
