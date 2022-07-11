@@ -1,0 +1,16 @@
+---
+
+- name: Create backup mount directory if it does not exist
+  ansible.builtin.file:
+    path: /mnt/backups
+    state: directory
+    attributes: "+i"
+    mode: '0755'
+
+- name: Mount up backup device by UUID
+  ansible.posix.mount:
+    path: /mnt/backups
+    src: 'UUID="{{ backup_disk_uuid }}"'
+    fstype: ext4
+    opts: nofail
+    state: mounted

@@ -83,6 +83,9 @@ appdata_path: /mnt/pve/pvedata/appdata
 storage_path: /mnt/storage
 local_domain: "{{ vault_domain_name }}"
 
+# backups
+backup_disk_uuid: "a6fef221-763e-46d4-88c1-212136d94125"
+
 containers:
   ###
   - service_name: influxdb

@@ -61,6 +61,7 @@
     - role: docker_config
     - role: ironicbadger.bash_aliases
     - role: grog.package
+    - role: mount_backup_disk
     - role: ironicbadger.docker_compose_generator
       tags: compose
     - role: docker_compose_up
@@ -71,4 +72,5 @@
     - role: ironicbadger.proxmox_nag_removal
     - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
+    
     
