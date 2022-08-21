@@ -11,6 +11,8 @@ nfs_iso_export: "{{ vault_nfs_iso_export }}"
 nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
 init_admin_pass: "{{ vault_init_admin_password }}"
 photoprism_db_password: "{{ vault_photoprism_db_password }}"
+cloudflare_account_email: "{{ vault_cf_email }}"
+cloudflare_api_key: "{{ vault_cf_api_key }}"
 
 # apprise
 apprise_path: /usr/local/bin/apprise
@@ -78,15 +80,60 @@ telegraf_plugins_base:
   - name: sensors
 
 # ironicbadger.docker_compose_generator
-appdata_path: /mnt/pve/pvedata/appdata
+appdata_path: /tank2/appdata
 # download_path: /mnt/nvme2tb/downloads
-storage_path: /mnt/storage
+media_path: /tank2/media
+storage_path: /tank2/archives
 local_domain: "{{ vault_domain_name }}"
 
 # backups
 backup_disk_uuid: "a6fef221-763e-46d4-88c1-212136d94125"
 
+# lm-traefik
+traefik_file_provider: true
+traefik_enable_dashboard: false #defaults to false
+traefik_insecure_transport: false #defaults to false
+traefik_exposed_by_default: false
+
 containers:
+  ###
+  - service_name: traefik
+    active: true
+    image: traefik
+    # container_name: tr
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`proxy.{{ local_domain }}`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+    command:
+      - --log.level=info
+      - --accesslog=false
+      - --api.insecure=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.cloudflare.acme.dnschallenge=true
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
+      - "--certificatesresolvers.cloudflare.acme.email={{ cloudflare_account_email }}"
+      - --certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json
+      - --serversTransport.insecureSkipVerify=true
+    volumes:
+      - "{{ appdata_path }}/traefik:/etc/traefik"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - "CLOUDFLARE_EMAIL={{ cloudflare_account_email }}"
+      - "CLOUDFLARE_API_KEY={{ cloudflare_api_key }}"
+    restart: unless-stopped
   ###
   - service_name: influxdb
     active: true
@@ -100,11 +147,9 @@ containers:
   - service_name: librespeed
     active: true
     image: linuxserver/librespeed
-    ports:
-      - 8080:80
-    # labels:
-    #   - traefik.enable=true
-    #   - "traefik.http.routers.librespeed.rule=Host(`speed.m.{{ local_domain }}`)"
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"
     environment:
       - MODE=standalone
       - TELEMETRY=true
@@ -115,11 +160,9 @@ containers:
   - service_name: filebrowser
     active: true
     image: filebrowser/filebrowser:s6
-    ports:
-      - 8081:80
-    # labels:
-    #   - traefik.enable=true
-    #   - "traefik.http.routers.fb.rule=Host(`files.m.{{ local_domain }}`)"
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.fb.rule=Host(`files.{{ local_domain }}`)"
     volumes:
       - "{{ storage_path }}:/srv"
       - "{{ appdata_path }}/filebrowser/db:/database.db"
@@ -130,19 +173,18 @@ containers:
   - service_name: jellyfin
     active: true
     image: jellyfin/jellyfin
-    network_mode: host
+    # network_mode: host
     devices:
       - /dev/dri:/dev/dri
-    # labels:
-    #   - traefik.enable=true
-    #   - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.m.{{ local_domain }}`)"
-    #   - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ local_domain }}`)"
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
     volumes:
       - "{{ appdata_path }}/jellyfin:/config"
-      # - "{{ storage_path }}:/data"
-      - "/mnt/media:/data"
-    # environment:
-      # - "JELLYFIN_PublishedServerUrl=emma-pc.{{ local_domain }}"
+      - "{{ media_path }}:/data"
+    environment:
+      - "JELLYFIN_PublishedServerUrl=jellyfin.{{ local_domain }}"
     include_global_env_vars: true
     restart: unless-stopped
     ###

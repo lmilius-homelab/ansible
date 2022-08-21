@@ -64,6 +64,8 @@
     - role: mount_backup_disk
     - role: ironicbadger.docker_compose_generator
       tags: compose
+    - role: lm-traefik
+      tags: compose
     - role: docker_compose_up
       tags: compose
     - role: rossmcdonald.telegraf
