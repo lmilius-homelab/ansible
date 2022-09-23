@@ -99,6 +99,10 @@
     state: restarted
   when: daemon_file.changed or startup_options.changed
 
+# - name: Create Docker Proxy Network
+#   docker_network:
+#     name: "proxy"
+
     #- name: "Update systemlimits for elasticsearch"
     #  ansible.posix.sysctl:
     #name: vm.max_map_count

@@ -1,5 +1,19 @@
 http:
-#  routers:
+  routers:
+    router-photoprism:
+      entryPoints:
+        - websecure
+      rule: "Host(`photos.{{ domain_name }}`)"
+      service: service-photoprism
+      tls:
+        certResolver: cloudflare
+    router-homeassistant:
+      entryPoints:
+        - websecure
+      rule: "Host(`homeassistant.{{ domain_name }}`)"
+      service: service-homeassistant
+      tls:
+        certResolver: cloudflare
 #    router-blueiris:
 #      entryPoints:
 #        - websecure
@@ -14,7 +28,15 @@ http:
 #      service: service-octoprint
 #      tls:
 #        certResolver: cloudflare
-#  services:
+  services:
+    service-photoprism:
+      loadBalancer:
+        servers:
+        - url: "http://{{ ansible_host }}:2342"
+    service-homeassistant:
+      loadBalancer:
+        servers:
+        - url: "http://10.10.200.10:8123"
 #    service-blueiris:
 #      loadBalancer:
 #        servers:

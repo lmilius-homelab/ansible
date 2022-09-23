@@ -59,6 +59,7 @@
         docker_users:
           - deployer
     - role: docker_config
+      tags: docker_config
     - role: ironicbadger.bash_aliases
     - role: grog.package
     - role: mount_backup_disk
@@ -68,7 +69,9 @@
       tags: compose
     - role: docker_compose_up
       tags: compose
-    - role: rossmcdonald.telegraf
+    - role: lm-photoprism
+      tags: compose
+    # - role: rossmcdonald.telegraf
     - role: zed_pushover
     - role: ironicbadger.hddtemp
     - role: ironicbadger.proxmox_nag_removal

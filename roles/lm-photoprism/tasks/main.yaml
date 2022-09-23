@@ -1,0 +1,21 @@
+---
+- name: ensure target dir exists
+  file:
+    dest: "{{ photoprism_compose_output_path }}/"
+    state: directory
+    owner: "{{ main_uid }}"
+    group: "{{ main_gid }}"
+
+- name: template docker compose config
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ photoprism_compose_output_path }}/docker-compose.yml"
+    owner: "{{ main_uid }}"
+    group: "{{ main_gid }}"
+
+- name: Docker Compose Up
+  ansible.builtin.shell:
+  args:
+    chdir: "{{ photoprism_compose_output_path }}"
+    cmd: "docker-compose up -d"
+  
