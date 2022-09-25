@@ -10,6 +10,7 @@
   template:
     src: templates/docker-compose.yml.j2
     dest: "{{ photoprism_compose_output_path }}/docker-compose.yml"
+    force: yes
     owner: "{{ main_uid }}"
     group: "{{ main_gid }}"
 

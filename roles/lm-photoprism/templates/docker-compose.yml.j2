@@ -55,8 +55,8 @@ services:
     #  - proxy
     #network_mode: host
     labels:
-      - traefik.enable=true
-      - "traefik.http.routers.photoprism.rule=Host(`photos.{{ local_domain }}`)"
+      - traefik.enable=false
+    #  - "traefik.http.routers.photoprism.rule=Host(`photos.{{ local_domain }}`)"
     #  - traefik.http.services.photoprism.loadbalancer.server.port=2342
     environment:
       PHOTOPRISM_ADMIN_PASSWORD: "{{ init_admin_pass }}"          # INITIAL PASSWORD FOR "admin" USER, MINIMUM 8 CHARACTERS

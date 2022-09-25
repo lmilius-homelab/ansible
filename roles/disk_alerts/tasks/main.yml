@@ -16,7 +16,7 @@
     dest: /root/hd.sh
     owner: root
     group: root
-    mode: '700'
+    mode: '711'
 
 - name: install boot notification script
   ansible.builtin.cron:

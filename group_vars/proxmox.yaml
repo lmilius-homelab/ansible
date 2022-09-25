@@ -94,7 +94,7 @@ backup_disk_uuid: "a6fef221-763e-46d4-88c1-212136d94125"
 
 # lm-traefik
 traefik_file_provider: true
-traefik_enable_dashboard: false #defaults to false
+traefik_enable_dashboard: true #defaults to false
 traefik_insecure_transport: false #defaults to false
 traefik_exposed_by_default: false
 
@@ -107,14 +107,13 @@ containers:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.rule=Host(`proxy.{{ local_domain }}`)"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.service=api@internal"
-      # - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
     # command:
     #   - --log.level=info
     #   - --accesslog=false
