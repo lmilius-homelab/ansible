@@ -2,5 +2,5 @@
 # handlers file for zfs
 - name: restart zed
   service: 
-    name: '{{ zfs_zed_service }}'
+    name: zed
     state: restarted

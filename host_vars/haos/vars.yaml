@@ -3,8 +3,8 @@ haos_proxmox_description: "HomeAssistant"
 # haos_proxmox_mac_address: 'AB:CD:EF:12:34:56'
 haos_proxmox_name: homeassistant
 haos_proxmox_node: "{{ vault_proxmox_node_name }}"
-haos_proxmox_storage: local
-haos_proxmox_memory: 4096
+haos_proxmox_storage: pve_data
+haos_proxmox_memory: 8192
 haos_proxmox_cores: 2
 haos_proxmox_api_password: "{{ vault_proxmox_api_password }}"
 haos_proxmox_api_user: "{{ vault_proxmox_api_user }}"
