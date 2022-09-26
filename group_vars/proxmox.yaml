@@ -82,10 +82,10 @@ telegraf_plugins_base:
 # ironicbadger.docker_compose_generator
 appdata_path: /tank2/appdata
 # download_path: /mnt/nvme2tb/downloads
-media_path: /tank2/media
+media_path: /tank2/media_
 storage_path: /tank2/archives
-photoprism_data_dir: /tank2/photoprism/PhotoPrism/photodata
-photoprism_db_dir: /tank2/photoprism/PhotoPrism/database
+photoprism_data_dir: /tank2/photoprism/photodata
+photoprism_db_dir: /tank2/photoprism/database
 photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "{{ vault_domain_name }}"
 
@@ -190,7 +190,9 @@ containers:
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
     volumes:
       - "{{ appdata_path }}/jellyfin:/config"
-      - "{{ media_path }}:/data"
+      - "{{ media_path }}books:/data/books"
+      - "{{ media_path }}movies:/data/movies"
+      - "{{ media_path }}tvshows:/data/tvshows"
     environment:
       - "JELLYFIN_PublishedServerUrl=jellyfin.{{ local_domain }}"
     include_global_env_vars: true
