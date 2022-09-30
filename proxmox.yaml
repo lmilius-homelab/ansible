@@ -69,8 +69,8 @@
       tags: compose
     - role: docker_compose_up
       tags: compose
-    - role: lm-photoprism
-      tags: compose
+    # - role: lm-photoprism
+    #   tags: compose
     # - role: rossmcdonald.telegraf
     - role: zed_pushover
     - role: ironicbadger.hddtemp

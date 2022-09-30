@@ -1,12 +1,12 @@
 http:
   routers:
-    router-photoprism:
-      entryPoints:
-        - websecure
-      rule: "Host(`photos.{{ domain_name }}`)"
-      service: service-photoprism
-      tls:
-        certResolver: cloudflare
+    # router-photoprism:
+    #   entryPoints:
+    #     - websecure
+    #   rule: "Host(`photos.{{ domain_name }}`)"
+    #   service: service-photoprism
+    #   tls:
+    #     certResolver: cloudflare
     router-homeassistant:
       entryPoints:
         - websecure
@@ -29,10 +29,10 @@ http:
 #      tls:
 #        certResolver: cloudflare
   services:
-    service-photoprism:
-      loadBalancer:
-        servers:
-        - url: "http://{{ ansible_host }}:2342"
+    # service-photoprism:
+    #   loadBalancer:
+    #     servers:
+    #     - url: "http://{{ ansible_host }}:2342"
     service-homeassistant:
       loadBalancer:
         servers:
