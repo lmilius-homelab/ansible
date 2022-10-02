@@ -310,3 +310,15 @@ containers:
       - "MARIADB_PASSWORD={{ photoprism_db_password }}"
       - "MARIADB_ROOT_PASSWORD={{ photoprism_db_password }}"
     include_global_env_vars: true
+
+  - service_name: duplicati
+    active: true
+    restart: unless-stopped
+    image: lscr.io/linuxserver/duplicati:latest
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.duplicati.rule=Host(`backups.{{ local_domain }}`)"
+      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+    volumes:
+      - "{{ photoprism_dir }}/originals:/source/photoprism/originals"
+      - "{{ appdata_path }}/duplicati/config:/config"
