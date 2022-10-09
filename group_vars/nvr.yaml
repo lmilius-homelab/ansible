@@ -160,32 +160,34 @@ containers:
     restart: unless-stopped
     include_global_env_vars: true
   ###
-  # - service_name: frigate
-  #   active: true
-  #   image: blakeblackshear/frigate:stable-amd64
-  #   shm_size: 256m
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.traefik.entrypoints=websecure"
-  #     - "traefik.http.routers.traefik.rule=Host(`frigate.{{ local_domain }}`)"
-  #   devices:
-  #     - /dev/dri
-  #     - /dev/apex_0:/dev/apex_0
-  #     - /dev/apex_1:/dev/apex_1
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"
-  #     - "{{ frigate_config_filepath }}/media:/media/frigate"
-  #     - "{{ frigate_config_filepath }}/database:/config/db"
-  #     - type: tmpfs # Option: 2GB of memory, reduces SSD wear
-  #       target: /tmp/cache
-  #       tmpfs:
-  #         size: 2000000000
-  #   ports:
-  #     - "1935:1935"
-  #   environment:
-  #     - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
-  #   include_global_env_vars: true
+  - service_name: frigate
+    active: true
+    image: blakeblackshear/frigate:stable
+    shm_size: 256m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frigate.entrypoints=websecure"
+      - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
+      - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+    devices:
+      - /dev/dri
+      - /dev/apex_0:/dev/apex_0
+      - /dev/apex_1:/dev/apex_1
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"
+      - "{{ frigate_config_filepath }}/media:/media/frigate"
+      - "{{ frigate_config_filepath }}/database:/config/db"
+      - type: tmpfs # Option: 2GB of memory, reduces SSD wear
+        target: /tmp/cache
+        tmpfs:
+          size: 2000000000
+    ports:
+      - "1935:1935"
+      - "5000:5000"
+    environment:
+      - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+    include_global_env_vars: true
   ###
   # - service_name: librespeed
   #   active: true
