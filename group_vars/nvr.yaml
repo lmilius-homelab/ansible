@@ -1,11 +1,11 @@
 ---
-ansible_host: "{{ vault_proxmox_host_ip }}"
+ansible_host: "{{ vault_nvr_host_ip }}"
 interface_name: eno1
 interfaces_template: "proxmox/interfaces.j2"
 proxmox_pass: "{{ vault_proxmox_pass }}"
 host_ip: "{{ ansible_host }}/24"
 gateway_ip: "{{ vault_gateway_ip }}"
-domain_name: "{{ vault_domain_name }}"
+domain_name: "nvr.{{ vault_domain_name }}"
 nas_ip: "{{ vault_nas_ip }}"
 nfs_iso_export: "{{ vault_nfs_iso_export }}"
 nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
@@ -145,6 +145,7 @@ containers:
     environment:
       - "CLOUDFLARE_EMAIL={{ cloudflare_account_email }}"
       - "CLOUDFLARE_API_KEY={{ cloudflare_api_key }}"
+    include_global_env_vars: true
     restart: unless-stopped
     # networks:
     #   - proxy
@@ -157,6 +158,7 @@ containers:
     ports:
       - 8086:8086
     restart: unless-stopped
+    include_global_env_vars: true
   ###
   # - service_name: frigate
   #   active: true
@@ -183,6 +185,7 @@ containers:
   #     - "1935:1935"
   #   environment:
   #     - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+  #   include_global_env_vars: true
   ###
   # - service_name: librespeed
   #   active: true
