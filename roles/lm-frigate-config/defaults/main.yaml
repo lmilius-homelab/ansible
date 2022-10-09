@@ -1,0 +1,10 @@
+
+---
+frigate_mqtt_host: ""
+frigate_mqtt_user: ""
+frigate_mqtt_password: ""
+
+rtsp_camera_username: ""
+rtsp_camera_password: ""
+
+camera_subnet_prefix: "" # first three octets of the IP address w/o trailing period ex. "192.168.1"

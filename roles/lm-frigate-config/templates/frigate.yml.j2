@@ -1,0 +1,135 @@
+mqtt:
+  host: "{{ frigate_mqtt_host }}"
+  user: "{{ frigate_mqtt_user }}"
+  password: "{{ frigate_mqtt_password }}"
+
+
+database:
+  path: /config/db/frigate.db
+  
+ffmpeg:
+  hwaccel_args:
+    - -hwaccel
+    - vaapi
+    - -hwaccel_device
+    - /dev/dri/renderD128
+    - -hwaccel_output_format
+    - yuv420p
+    
+#live:
+#  height: 1080
+
+cameras:
+  doorbell:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
+          roles:
+            - record
+            - rtmp
+        - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"
+          roles:
+            - detect
+    detect:
+      fps: 5
+      # width: 3840
+      # height: 2160
+    #zones:
+    #  mail:
+    #    coordinates: 31,688,0,462,794,231,953,305
+    #    objects:
+    #      - person
+    #    filters:
+    #      person:
+    #        threshold: 0.82
+    #  entire_street:
+    #    coordinates: 0,365,0,303,289,209,557,161,560,207,370,241
+    #  entire_yard:
+    #    coordinates: 720,481,1099,325,904,272,961,246,684,212,546,207,435,228,0,363,41,720,325,720
+    #    objects:
+    #      - person
+    #      - dog
+    #      - cat
+    #  front_door:
+    #    coordinates: 972,273,1028,248,1082,256,1107,113,1157,119,1129,320
+    #    objects:
+    #      - person
+    #      - dog
+    #      - cat
+    #  lower_driveway:
+    #    coordinates: 753,219,806,190,739,175,584,202
+    #  upper_driveway:
+    #    coordinates: 1014,253,1074,233,847,191,775,212
+  # cam1:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+  #         roles:
+  #           - record
+  #           - rtmp
+  #           - detect
+  #   detect:
+  #     fps: 10
+  # cam2:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14:8554/unicast"
+  #         roles:
+  #           - record
+  #           - rtmp
+  #           - detect
+  #   detect:
+  #     fps: 10
+  # cam2:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14:8554/video3_unicast"
+  #         roles:
+  #           - record
+  #           - rtmp
+  #           - detect
+  #   detect:
+  #     fps: 10
+
+#objects:
+#  track:
+#    - person
+#    - car
+#    - dog
+#    - cat
+
+#birdseye:
+#  enabled: true
+#  width: 1920
+#  height: 1080
+#  quality: 6
+#  mode: objects
+
+snapshots:
+  enabled: true
+  timestamp: true
+  bounding_box: true
+  retain:
+    default: 60
+
+record:
+  enabled: true
+  retain:
+    days: 30
+    mode: all
+  events:
+    retain:
+      default: 30
+      mode: active_objects
+
+detectors:
+  coral1:
+    type: edgetpu
+    device: pci:0
+  coral2:
+    type: edgetpu
+    device: pci:1
+
+timestamp_style:
+  position: "bl"
+  effect: shadow

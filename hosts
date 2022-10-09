@@ -1,5 +1,8 @@
 [proxmox]
 pve1
 
+[nvr]
+pve2
+
 [homeassistant]
 haos

@@ -1,0 +1,84 @@
+---
+# - hosts: proxmox
+#   become: true
+#   vars_files: vault.yaml
+#   serial: 1
+#   tasks:
+#     - name: Install bridge-utils
+#       apt:
+#         name: 
+#         - bridge-utils
+
+#     - name: Configure /etc/network/interfaces
+#       template:
+#         src: "{{ interfaces_template }}"
+#         dest: /etc/network/interfaces
+#       register: _configure_interfaces
+
+#     - block:
+#       - name: Reboot for networking changes
+#         shell: "sleep 5 && shutdown -r now 'Networking changes found, rebooting'"
+#         async: 1
+#         poll: 0
+
+#       - name: Wait for server to come back online
+#         wait_for_connection:
+#           delay: 15
+#       when: _configure_interfaces is changed
+
+- hosts: nvr
+  become: true
+  vars_files: vault.yaml
+  roles:
+    # - role: geerlingguy.ntp
+    #   ntp_manage_config: true
+    #   ntp_servers:
+    #     - time.cloudflare.com
+    # - role: mrlesmithjr.zfs
+    #   arch: amd64
+    # - role: lae.proxmox
+    #   pve_zfs_enabled: yes
+    #   pve_watchdog: ipmi
+    #   pve_run_system_upgrades: true
+    #   pve_run_proxmox_upgrades: true
+    #   pve_storages:
+    #     - name: isos
+    #       type: nfs
+    #       content: [ "vztmpl", "iso" ]
+    #       server: "{{ nas_ip }}"
+    #       export: "{{ nfs_iso_export }}"
+    #       state: "present"
+    #     - name: pve_data
+    #       type: nfs
+    #       content: [ "images", "backup", "snippets", "rootdir" ]
+    #       server: "{{ nas_ip }}"
+    #       export: "{{ nfs_pvedata_export }}"
+    #       state: "present"
+    - role: geerlingguy.docker
+      vars:
+        docker_users:
+          - deployer
+    - role: docker_config
+      tags: docker_config
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: lm-coraltpu
+    # - role: mount_backup_disk
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: lm-traefik
+      tags: compose
+    - role: lm-frigate-config
+      tags: compose
+    - role: docker_compose_up
+      tags: compose
+    # - role: lm-photoprism
+    #   tags: compose
+    # - role: rossmcdonald.telegraf
+    - role: zed_pushover
+    - role: ironicbadger.hddtemp
+    - role: ironicbadger.proxmox_nag_removal
+    - role: ironicbadger.apprise_boot_notification
+    - role: disk_alerts
+    
+    

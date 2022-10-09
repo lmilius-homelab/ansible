@@ -1,0 +1,40 @@
+---
+- name: Add coral repository into sources list
+  ansible.builtin.apt_repository:
+    repo: deb https://packages.cloud.google.com/apt coral-edgetpu-stable main
+    state: present
+    filename: coral-edgetpu
+
+- name: Add google gpg signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Update repositories cache and install drivers package
+  ansible.builtin.apt:
+    pkg: 
+    - gasket-dkms
+    - libedgetpu1-std
+    update_cache: yes
+
+- name: ensure target dir exists
+  file:
+    dest: "/etc/udev/rules.d/"
+    state: directory
+
+- name: template frigate config
+  template:
+    src: templates/65-apex.rules.j2
+    dest: "/etc/udev/rules.d/65-apex.rules"
+    force: yes
+
+- name: Create apex group
+  group:
+    name: apex
+
+- name: "Add docks user to apex group"
+  user:
+    name: docks
+    append: yes
+    groups:
+      - apex
