@@ -16,8 +16,8 @@ ffmpeg:
     - -hwaccel_output_format
     - yuv420p
     
-live:
-  height: 1080
+#live:
+#  height: 1080
 
 cameras:
   doorbell:
@@ -27,13 +27,14 @@ cameras:
           roles:
             - record
             - rtmp
-        - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"
-          roles:
             - detect
+        #- path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"
+        #  roles:
+        #    - detect
     detect:
       fps: 5
-      # width: 3840
-      # height: 2160
+      #width: 1920
+      #height: 1080
     #zones:
     #  mail:
     #    coordinates: 31,688,0,462,794,231,953,305
@@ -60,36 +61,19 @@ cameras:
     #    coordinates: 753,219,806,190,739,175,584,202
     #  upper_driveway:
     #    coordinates: 1014,253,1074,233,847,191,775,212
-  # cam1:
-  #   ffmpeg:
-  #     inputs:
-  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
-  #         roles:
-  #           - record
-  #           - rtmp
-  #           - detect
-  #   detect:
-  #     fps: 10
-  # cam2:
-  #   ffmpeg:
-  #     inputs:
-  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14:8554/unicast"
-  #         roles:
-  #           - record
-  #           - rtmp
-  #           - detect
-  #   detect:
-  #     fps: 10
-  # cam2:
-  #   ffmpeg:
-  #     inputs:
-  #       - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14:8554/video3_unicast"
-  #         roles:
-  #           - record
-  #           - rtmp
-  #           - detect
-  #   detect:
-  #     fps: 10
+  cam1:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
 
 objects:
   track:
@@ -102,7 +86,7 @@ birdseye:
   enabled: true
   width: 1920
   height: 1080
-  quality: 6
+  quality: 8
   mode: objects
 
 snapshots:
