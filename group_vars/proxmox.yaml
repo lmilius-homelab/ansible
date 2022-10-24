@@ -220,7 +220,7 @@ containers:
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
-    restat: unless-stopped
+    restart: unless-stopped
     # ports:
       # - "2342:2342" # HTTP port
     labels:
@@ -322,3 +322,16 @@ containers:
     volumes:
       - "{{ photoprism_dir }}/originals:/source/photoprism/originals"
       - "{{ appdata_path }}/duplicati/config:/config"
+
+  - service_name: portainer
+    active: true
+    restart: unless-stopped
+    image: portainer/portainer-ce:latest
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ local_domain }}`)"
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+    volumes:
+      - "{{ appdata_path }}/portainer/data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    include_global_env_vars: true
