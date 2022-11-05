@@ -85,6 +85,7 @@ appdata_path: /tank2/appdata
 media_path: /tank2/media_
 storage_path: /tank2/archives
 photoprism_dir: /tank2/photoprism
+photoprism_important: /tank2/media_photos/Important
 # photoprism_db_dir: /tank2/photoprism/database
 photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "{{ vault_domain_name }}"
@@ -279,6 +280,7 @@ containers:
   #     # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
       - "{{ photoprism_dir }}/storage:/photoprism/storage"
       - "{{ photoprism_dir }}/originals:/photoprism/originals"
+      - "{{ photoprism_important }}:/photoprism/originals/Important:ro"
       - "{{ photoprism_dir }}/import:/photoprism/import"
   #   ###
   - service_name: photoprism_mariadb
