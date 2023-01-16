@@ -11,6 +11,8 @@ nfs_iso_export: "{{ vault_nfs_iso_export }}"
 nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
 init_admin_pass: "{{ vault_init_admin_password }}"
 photoprism_db_password: "{{ vault_photoprism_db_password }}"
+nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
+nextcloud_root_db_password: "{{ vault_nextcloud_root_db_password }}"
 cloudflare_account_email: "{{ vault_cf_email }}"
 cloudflare_api_key: "{{ vault_cf_api_key }}"
 
@@ -89,6 +91,7 @@ photoprism_important: /tank2/media_photos/Important
 # photoprism_db_dir: /tank2/photoprism/database
 photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "{{ vault_domain_name }}"
+backup_drive: "/mnt/backups"
 
 # backups
 backup_disk_uuid: "a6fef221-763e-46d4-88c1-212136d94125"
@@ -324,6 +327,7 @@ containers:
     volumes:
       - "{{ photoprism_dir }}/originals:/source/photoprism/originals"
       - "{{ appdata_path }}/duplicati/config:/config"
+      - "{{ backup_drive }}/duplicati:/local_backup"
 
   - service_name: portainer
     active: true
@@ -337,3 +341,67 @@ containers:
       - "{{ appdata_path }}/portainer/data:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
     include_global_env_vars: true
+
+  - service_name: nextcloud
+    active: true
+    restart: unless-stopped
+    image: nextcloud:stable
+    depends_on:
+      - nextcloud_mariadb
+      # - nextcloud_redis
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.{{ local_domain }}`)"
+      - traefik.http.services.nextcloud.loadbalancer.server.port=80
+    volumes:
+      - "{{ appdata_path }}/nextcloud/data:/var/www/html"
+    # environment:
+    #   - REDIS_HOST=redis
+    include_global_env_vars: true
+
+  - service_name: nextcloud_mariadb
+    active: true
+    restart: unless-stopped
+    image: mariadb:10.5
+    volumes:
+      - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"
+    environment:
+      - MYSQL_AUTO_UPGRADE=1
+      - MYSQL_DISABLE_UPGRADE_BACKUP=1
+      - "MYSQL_DATABASE=nextcloud"
+      - "MYSQL_USER=nextcloud"
+      - "MYSQL_PASSWORD={{ nextcloud_db_password }}"
+      - "MYSQL_ROOT_PASSWORD={{ nextcloud_root_db_password }}"
+    include_global_env_vars: true
+
+  - service_name: paperless_redis
+    active: true
+    restart: unless-stopped
+    image: docker.io/library/redis:7
+
+  - service_name: paperless
+    active: true
+    restart: unless-stopped
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    depends_on: 
+      - paperless_redis
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.paperless.rule=Host(`paperless.{{ local_domain }}`)"
+      - traefik.http.services.paperless.loadbalancer.server.port=8000
+    # healthcheck:
+    #   test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    volumes:
+      - "{{ appdata_path }}/paperless/data:/usr/src/paperless/data"
+      - "{{ appdata_path }}/paperless/media:/usr/src/paperless/media"
+      - "{{ appdata_path }}/paperless/export:/usr/src/paperless/export"
+      - "{{ appdata_path }}/paperless/consume:/usr/src/paperless/consume"
+    environment:
+      - "PAPERLESS_REDIS=redis://paperless_redis:6379"
+      - "PAPERLESS_URL=https://paperless.{{ local_domain }}"
+      - "PAPERLESS_TIME_ZONE={{ ntp_timezone }}"
+      - "USERMAP_UID={{ main_uid }}"
+      - "USERMAP_GID={{ main_gid }}"
