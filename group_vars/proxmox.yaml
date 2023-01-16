@@ -91,7 +91,7 @@ photoprism_important: /tank2/media_photos/Important
 # photoprism_db_dir: /tank2/photoprism/database
 photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "{{ vault_domain_name }}"
-backup_drive: "/mnt/backups"
+backup_drive: "/mnt/backups/BACKUPS"
 
 # backups
 backup_disk_uuid: "a6fef221-763e-46d4-88c1-212136d94125"
