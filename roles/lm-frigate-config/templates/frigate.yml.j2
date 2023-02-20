@@ -40,6 +40,11 @@ cameras:
         coordinates: 611,539,1280,494,1280,720,152,720,91,481
         objects:
           - person
+      driveway:
+        coordinates: 248,477,106,442,111,494
+        objects:
+          - person
+          - car
     #  mail:
     #    coordinates: 31,688,0,462,794,231,953,305
     #    objects:
@@ -65,21 +70,36 @@ cameras:
     #    coordinates: 753,219,806,190,739,175,584,202
     #  upper_driveway:
     #    coordinates: 1014,253,1074,233,847,191,775,212
-  cam1:
-    ffmpeg:
-      inputs:
-        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
-          roles:
-            - record
-            - rtmp
-            - detect
-    detect:
-      fps: 5
-    objects:
-      track:
-        - person
-        - cat
-        - dog
+  #cam1:
+  #  ffmpeg:
+  #    inputs:
+  #      - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+  #        roles:
+  #          - record
+  #          - rtmp
+  #          - detect
+  #  detect:
+  #    fps: 5
+  #  objects:
+  #    track:
+  #      - person
+  #      - cat
+  #      - dog
+  #cam3:
+  #  ffmpeg:
+  #    inputs:
+  #      - path: "rtsp://{{ camera_subnet_prefix }}.21:8554/unicast"
+  #        roles:
+  #          - record
+  #          - rtmp
+  #          - detect
+  #  detect:
+  #    fps: 5
+  #  objects:
+  #    track:
+  #      - person
+  #      - cat
+  #      - dog
 
 objects:
   track:

@@ -81,14 +81,15 @@ telegraf_plugins_base:
         - "eno1"
   - name: sensors
 
+zfs_path: /tank2
 # ironicbadger.docker_compose_generator
-appdata_path: /tank2/appdata
+appdata_path: "{{ zfs_path }}/appdata"
 # download_path: /mnt/nvme2tb/downloads
-media_path: /tank2/media_
-storage_path: /tank2/archives
-photoprism_dir: /tank2/photoprism
-photoprism_important: /tank2/media_photos/Important
-# photoprism_db_dir: /tank2/photoprism/database
+media_path: "{{ zfs_path }}/media_"
+storage_path: "{{ zfs_path }}/archives"
+photoprism_dir: "{{ zfs_path }}/photoprism"
+photoprism_important: "{{ zfs_path }}/media_photos/Important"
+# photoprism_db_dir: "{{ zfs_path }}/photoprism/database"
 photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "{{ vault_domain_name }}"
 backup_drive: "/mnt/backups/BACKUPS"
@@ -326,6 +327,7 @@ containers:
       - traefik.http.services.duplicati.loadbalancer.server.port=8200
     volumes:
       - "{{ photoprism_dir }}/originals:/source/photoprism/originals"
+      - "{{ zfs_path }}:/source/tank2"
       - "{{ appdata_path }}/duplicati/config:/config"
       - "{{ backup_drive }}/duplicati:/local_backup"
 
@@ -405,3 +407,18 @@ containers:
       - "PAPERLESS_TIME_ZONE={{ ntp_timezone }}"
       - "USERMAP_UID={{ main_uid }}"
       - "USERMAP_GID={{ main_gid }}"
+
+  - service_name: mealie
+    active: true
+    image: hkotel/mealie
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
+    environment:
+      - DB_TYPE=sqlite
+      - ALLOW_SIGNUP=false
+      - "BASE_URL=https://mealie.{{ local_domain }}"
+    volumes:
+      - "{{ appdata_path }}/mealie/data:/app/data"
+    restart: unless-stopped
+    include_global_env_vars: true
