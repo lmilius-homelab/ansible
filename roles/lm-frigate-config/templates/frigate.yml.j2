@@ -70,36 +70,51 @@ cameras:
     #    coordinates: 753,219,806,190,739,175,584,202
     #  upper_driveway:
     #    coordinates: 1014,253,1074,233,847,191,775,212
-  #cam1:
-  #  ffmpeg:
-  #    inputs:
-  #      - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
-  #        roles:
-  #          - record
-  #          - rtmp
-  #          - detect
-  #  detect:
-  #    fps: 5
-  #  objects:
-  #    track:
-  #      - person
-  #      - cat
-  #      - dog
-  #cam3:
-  #  ffmpeg:
-  #    inputs:
-  #      - path: "rtsp://{{ camera_subnet_prefix }}.21:8554/unicast"
-  #        roles:
-  #          - record
-  #          - rtmp
-  #          - detect
-  #  detect:
-  #    fps: 5
-  #  objects:
-  #    track:
-  #      - person
-  #      - cat
-  #      - dog
+  cam1:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
+  cam2:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14/live"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
+  cam3:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16:8554/unicast"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
 
 objects:
   track:
@@ -113,7 +128,8 @@ birdseye:
   width: 1920
   height: 1080
   quality: 8
-  mode: objects
+  #mode: objects
+  mode: continuous
 
 snapshots:
   enabled: true
