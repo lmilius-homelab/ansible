@@ -428,23 +428,26 @@ containers:
   - service_name: wordpress-shop
     active: true
     image: wordpress
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wordpress-shop.rule=Host(`shop.{{ local_domain }}`)
     environment:
-      - WORDPRESS_DB_HOST=shop-db
-      - WORDPRESS_DB_USER=shop-db
+      - WORDPRESS_DB_HOST=shopdb
+      - WORDPRESS_DB_USER=shopdb
       - "WORDPRESS_DB_PASSWORD={{ wordpress_shop_db_password }}"
-      - WORDPRESS_DB_NAME=shop-db
+      - WORDPRESS_DB_NAME=shopdb
     volumes:
       - "{{ appdata_path }}/wordpress-shop/data:/var/www/html"
     restart: unless-stopped
 
-  - service_name: shop-db
+  - service_name: shopdb
     active: true
     image: mysql:5.7
     environment:
-      - MYSQL_DATABASE=shop-db
-      - MYSQL_USER=shop-db
-      - "MYSQL_PASSWORD={{ wordpress_shop_root_db_password }}"
-      - MYSQL_RANDOM_ROOT_PASSWORD=1
+      - MYSQL_DATABASE=shopdb
+      - MYSQL_USER=shopdb
+      - "MYSQL_PASSWORD={{ wordpress_shop_db_password }}"
+      - MYSQL_RANDOM_ROOT_PASSWORD={{ wordpress_shop_root_db_password }}
     volumes:
       - "{{ appdata_path }}/wordpress-shop/db:/var/lib/mysql"
     restart: unless-stopped

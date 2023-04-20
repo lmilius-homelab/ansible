@@ -8,16 +8,27 @@ database:
   path: /config/db/frigate.db
   
 ffmpeg:
-  hwaccel_args:
-    - -hwaccel
-    - vaapi
-    - -hwaccel_device
-    - /dev/dri/renderD128
-    - -hwaccel_output_format
-    - yuv420p
+  hwaccel_args: preset-vaapi
+  #  - -hwaccel
+  #  - vaapi
+  #  - -hwaccel_device
+  #  - /dev/dri/renderD128
+  #  - -hwaccel_output_format
+  #  - yuv420p
     
 #live:
 #  height: 1080
+
+go2rtc:
+  streams:
+    doorbell:
+      - "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
+    cam1:
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+    cam2:
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14/live"
+    cam3:
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16:8554/unicast"
 
 cameras:
   doorbell:
@@ -26,7 +37,7 @@ cameras:
         - path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
           roles:
             - record
-            - rtmp
+            #- rtmp
             - detect
         #- path: "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"
         #  roles:
@@ -141,7 +152,7 @@ snapshots:
 record:
   enabled: true
   retain:
-    days: 30
+    days: 14
     mode: all
   events:
     retain:

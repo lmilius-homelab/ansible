@@ -162,7 +162,8 @@ containers:
   ###
   - service_name: frigate
     active: true
-    image: blakeblackshear/frigate:stable
+    privileged: true
+    image: ghcr.io/blakeblackshear/frigate:stable
     shm_size: 256m
     labels:
       - "traefik.enable=true"
@@ -170,7 +171,7 @@ containers:
       - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
       - "traefik.http.services.frigate.loadbalancer.server.port=5000"
     devices:
-      - /dev/dri
+      - /dev/dri/renderD128
       - /dev/apex_0:/dev/apex_0
       - /dev/apex_1:/dev/apex_1
     volumes:
@@ -185,6 +186,9 @@ containers:
     ports:
       - "1935:1935"
       - "5000:5000"
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
     environment:
       - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
     include_global_env_vars: true
