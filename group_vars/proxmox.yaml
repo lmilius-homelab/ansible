@@ -17,6 +17,9 @@ cloudflare_account_email: "{{ vault_cf_email }}"
 cloudflare_api_key: "{{ vault_cf_api_key }}"
 wordpress_shop_db_password: "{{ vault_wordpress_shop_db_password }}"
 wordpress_shop_root_db_password: "{{ vault_wordpress_shop_root_db_password }}"
+peertube_db_password: "{{ vault_peertube_db_password }}"
+peertube_secret: "{{ vault_peertube_secret }}"
+admin_email: "{{ vault_admin_email }}"
 
 # apprise
 apprise_path: /usr/local/bin/apprise
@@ -200,6 +203,7 @@ containers:
       - "{{ media_path }}books:/data/books"
       - "{{ media_path }}movies:/data/movies"
       - "{{ media_path }}tvshows:/data/tvshows"
+      - "{{ media_path }}videos:/data/videos"
     environment:
       - "JELLYFIN_PublishedServerUrl=jellyfin.{{ local_domain }}"
     include_global_env_vars: true
@@ -439,6 +443,8 @@ containers:
     volumes:
       - "{{ appdata_path }}/wordpress-shop/data:/var/www/html"
     restart: unless-stopped
+    depends_on:
+      - shopdb
 
   - service_name: shopdb
     active: true
@@ -451,3 +457,96 @@ containers:
     volumes:
       - "{{ appdata_path }}/wordpress-shop/db:/var/lib/mysql"
     restart: unless-stopped
+
+  - service_name: peertube
+    active: true
+    privileged: true
+    image: chocobozzz/peertube:production-bullseye
+    environment:
+      - PEERTUBE_DB_USERNAME=postgres
+      - PEERTUBE_DB_PASSWORD={{ peertube_db_password }}
+      - PEERTUBE_DB_SSL=false
+      - PEERTUBE_DB_HOSTNAME=peertube_postgres
+      - PEERTUBE_WEBSERVER_HOSTNAME=tube.miliushome.com
+      - PEERTUBE_ADMIN_EMAIL={{ admin_email }}
+      - PEERTUBE_SECRET={{ peertube_secret }}
+      - PEERTUBE_REDIS_HOSTNAME=peertube_redis
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.peertube.rule=Host(`tube.{{ local_domain }}`)
+      - traefik.http.services.peertube.loadbalancer.server.port=9000
+    volumes:
+      - "{{ appdata_path }}/peertube/assets:/app/client/dist"
+      - "{{ appdata_path }}/peertube/data:/data"
+      - "{{ appdata_path }}/peertube/config:/config"
+    devices:  
+      - /dev/dri:/dev/dri
+    restart: "unless-stopped"
+    include_global_env_vars: true
+    depends_on:
+      - peertube_postgres
+      - peertube_redis
+    
+  - service_name: peertube_postgres
+    active: true
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=peertube
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD={{ peertube_db_password }}
+    volumes:
+      - "{{ appdata_path }}/peertube/db:/var/lib/postgresql/data"
+    restart: "unless-stopped"
+
+  - service_name: peertube_redis
+    active: true
+    image: redis:6-alpine
+    volumes:
+      - "{{ appdata_path }}/peertube/redis:/data"
+    restart: "unless-stopped"
+
+  - service_name: ytdl_material
+    active: true
+    image: tzahi12345/youtubedl-material:latest
+    environment:
+      - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
+      - ytdl_use_local_db=false
+      - write_ytdl_config=true
+    restart: "unless-stopped"
+    volumes:
+      - "{{ appdata_path }}/ytdl/appdata:/app/appdata"
+      - "{{ appdata_path }}/ytdl/audio:/app/audio"
+      - "{{ media_path }}videos/videos:/app/video"
+      - "{{ media_path }}videos/subscriptions:/app/subscriptions"
+      - "{{ appdata_path }}/ytdl/users:/app/users"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ytdl.rule=Host(`tube-dl.{{ local_domain }}`)
+      - traefik.http.services.ytdl.loadbalancer.server.port=17442
+    depends_on:
+      - ytdl_mongodb
+
+  - service_name: ytdl_mongodb
+    active: true
+    image: mongo:4
+    logging:
+      driver: "none"
+    restart: "unless-stopped"
+    volumes:
+      - "{{ appdata_path }}/ytdl/db:/data/db"
+
+  - service_name: handbrake
+    active: true
+    privileged: true
+    image: jlesage/handbrake:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
+      - traefik.http.services.handbrake.loadbalancer.server.port=5800
+    volumes:
+      - "{{ appdata_path }}/handbrake/config:/config"
+      - "{{ media_path }}movies:/storage/movies"
+      - "{{ media_path }}videos:/storage/videos"
+    devices:  
+      - /dev/dri:/dev/dri
+    restart: "unless-stopped"
