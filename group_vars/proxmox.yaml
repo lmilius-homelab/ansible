@@ -20,6 +20,7 @@ wordpress_shop_root_db_password: "{{ vault_wordpress_shop_root_db_password }}"
 peertube_db_password: "{{ vault_peertube_db_password }}"
 peertube_secret: "{{ vault_peertube_secret }}"
 admin_email: "{{ vault_admin_email }}"
+peertube_admin_password: "{{ vault_peertube_admin_password }}"
 
 # apprise
 apprise_path: /usr/local/bin/apprise
@@ -471,16 +472,17 @@ containers:
       - PEERTUBE_ADMIN_EMAIL={{ admin_email }}
       - PEERTUBE_SECRET={{ peertube_secret }}
       - PEERTUBE_REDIS_HOSTNAME=peertube_redis
+      - PT_INITIAL_ROOT_PASSWORD={{ peertube_admin_password }}
     labels:
       - traefik.enable=true
       - traefik.http.routers.peertube.rule=Host(`tube.{{ local_domain }}`)
       - traefik.http.services.peertube.loadbalancer.server.port=9000
     volumes:
-      - "{{ appdata_path }}/peertube/assets:/app/client/dist"
+      # - "{{ appdata_path }}/peertube/assets:/app/client/dist"
       - "{{ appdata_path }}/peertube/data:/data"
       - "{{ appdata_path }}/peertube/config:/config"
     devices:  
-      - /dev/dri:/dev/dri
+      - /dev/dri
     restart: "unless-stopped"
     include_global_env_vars: true
     depends_on:
@@ -525,6 +527,7 @@ containers:
       - traefik.http.services.ytdl.loadbalancer.server.port=17442
     depends_on:
       - ytdl_mongodb
+    include_global_env_vars: true
 
   - service_name: ytdl_mongodb
     active: true
@@ -550,3 +553,49 @@ containers:
     devices:  
       - /dev/dri:/dev/dri
     restart: "unless-stopped"
+    include_global_env_vars: true
+
+  - service_name: fileflows
+    active: true
+    image: revenz/fileflows
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.fileflows.rule=Host(`fileflows.{{ local_domain }}`)
+      - traefik.http.services.fileflows.loadbalancer.server.port=5000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "{{ appdata_path }}/fileflows/data:/app/Data"
+      - "{{ appdata_path }}/fileflows/logs:/app/Logs"
+      - "{{ appdata_path }}/fileflows/media:/media"
+      - "{{ appdata_path }}/fileflows/temp:/temp"
+    restart: "unless-stopped"
+    include_global_env_vars: true
+    environment:
+      - TempPathHost=/temp
+    devices:  
+      - /dev/dri
+
+  - service_name: archivebox
+    active: true
+    image: archivebox/archivebox
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
+      - traefik.http.services.archivebox.loadbalancer.server.port=8000
+    volumes:
+      - "{{ appdata_path }}/archivebox/data:/data"
+    include_global_env_vars: true
+    environment:
+      - SAVE_ARCHIVE_DOT_ORG=FALSE
+
+  - service_name: metube
+    active: true
+    image: ghcr.io/alexta69/metube
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
+      - traefik.http.services.metube.loadbalancer.server.port=8081
+    volumes:
+      - "{{ media_path }}videos/metube:/downloads"
+    include_global_env_vars: true
+
