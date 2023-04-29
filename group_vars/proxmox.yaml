@@ -21,6 +21,7 @@ peertube_db_password: "{{ vault_peertube_db_password }}"
 peertube_secret: "{{ vault_peertube_secret }}"
 admin_email: "{{ vault_admin_email }}"
 peertube_admin_password: "{{ vault_peertube_admin_password }}"
+joplin_postgres_password: "{{ vault_joplin_postgres_password }}"
 
 # apprise
 apprise_path: /usr/local/bin/apprise
@@ -608,6 +609,39 @@ containers:
       - traefik.http.services.dashy.loadbalancer.server.port=80
     volumes:
       - "{{ appdata_path }}/dashy/conf.yml:/app/public/conf.yml"
+      # - "{{ appdata_path }}/dashy/dist:/app/dist"
     restart: "unless-stopped"
     include_global_env_vars: true
 
+  - service_name: joplin
+    active: true
+    image: joplin/server:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.joplin.rule=Host(`joplin.{{ local_domain }}`)
+      - traefik.http.services.joplin.loadbalancer.server.port=22300
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=https://joplin.{{ local_domain }}
+      - DB_CLIENT=pg
+      - POSTGRES_PASSWORD={{ joplin_postgres_password }}
+      - POSTGRES_DATABASE=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=joplin_db
+    include_global_env_vars: true
+    restart: "unless-stopped"
+    depends_on:
+      - joplin_db
+
+  - service_name: joplin_db
+    active: true
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD={{ joplin_postgres_password }}
+      - POSTGRES_USER=joplin
+      - POSTGRES_DB=joplin
+    include_global_env_vars: true
+    volumes:
+      - "{{ appdata_path }}/joplin/db:/var/lib/postgresql/data"
+    restart: "unless-stopped"

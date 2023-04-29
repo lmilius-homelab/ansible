@@ -6,3 +6,6 @@ pve2
 
 [homeassistant]
 haos
+
+[docker-lxc]
+docker-01
