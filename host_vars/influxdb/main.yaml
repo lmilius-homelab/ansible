@@ -4,8 +4,8 @@
 ### Proxmox API connection and authentication section ###
 #########################################################
 pve_default_behavior: no_defaults
-pve_node: pve2
-pve_api_host: 10.10.200.91
+pve_node: pve3
+pve_api_host: 10.10.200.92
 pve_api_user: root@pam
 pve_api_password: "{{ vault_proxmox_api_password }}"
 # pve_api_token_id: root@pam!ansible
@@ -15,7 +15,7 @@ pve_api_password: "{{ vault_proxmox_api_password }}"
 ### Container OS template section ###
 #####################################
 pve_lxc_ostemplate_name: 'ubuntu-22.04-standard_22.04-1_amd64.tar.zst'
-pve_lxc_ostemplate_storage: vms
+pve_lxc_ostemplate_storage: local
 pve_lxc_ostemplate_content_type: vztmpl
 pve_lxc_ostemplate_timeout: 60
 pve_lxc_ostemplate_force: no
@@ -26,7 +26,7 @@ pve_lxc_ostemplate_state: present
 ##############################################
 pve_lxc_timeout: 30
 pve_hostname: "{{ inventory_hostname.split('.')[0] }}"
-pve_lxc_vmid: 202
+pve_lxc_vmid: 301
 pve_lxc_description: |
   This host is an Ubuntu 22-04 container configured via Ansible with:
   - 2 CPU cores
@@ -34,14 +34,15 @@ pve_lxc_description: |
   - 50GB of system disk
   - unprivileged: yes
   - onboot: no
-pve_lxc_root_password: "{{ vault_docker02_root_password }}"
+  Designed to run influxdb for the smart home
+pve_lxc_root_password: "{{ vault_influxdb_lxc_root_password }}"
 pve_lxc_root_authorized_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 pve_lxc_cpu_cores: 2
 pve_lxc_memory: 1024
 pve_lxc_swap: 512
 pve_lxc_disk: 50
-pve_lxc_storage: vms
+pve_lxc_storage: local-lvm
 pve_onboot: no
 pve_lxc_searchdomain: milius.home
 pve_lxc_unprivileged: yes
@@ -52,7 +53,10 @@ pve_lxc_net_interfaces:
   - id: net0
     name: eth0
     bridge: vmbr0
-    ip4: dhcp
+    hwaddr: 3A:A4:62:5E:97:39
+    ip4: "{{ vault_influxdb_lxc_ip }}"
+    netmask4: "24"
+    gw4: "10.10.200.1"
 
 # List of additional mount points and their characteristics
 # pve_lxc_mounts:
@@ -88,20 +92,27 @@ pve_lxc_net_interfaces:
 #     line: 'lxc.hook.autodev = sh -c "modprobe tun; cd ${LXC_ROOTFS_MOUNT}/dev; mkdir net; mknod net/tun c 10 200; chmod 0666 net/tun"'
 #     state: present
 
-
+appdata_path: "/appdata"
 
 containers: 
-  - service_name: librespeed
+  - service_name: influxdb
     active: true
-    image: linuxserver/librespeed
-    # labels:
-    #   - traefik.enable=true
-    #   - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"
+    image: influxdb:2.7
     environment:
       - MODE=standalone
       - TELEMETRY=false
-      # - "PASSWORD={{ librespeed_password }}"
+      - DOCKER_INFLUXDB_INIT_MODE=upgrade
+      - DOCKER_INFLUXDB_INIT_USERNAME=homeassistant
+      - DOCKER_INFLUXDB_INIT_PASSWORD={{ vault_influxdb_homeassistant_password }}
+      - DOCKER_INFLUXDB_INIT_ORG=homelab
+      - DOCKER_INFLUXDB_INIT_BUCKET=homeassistant
     include_global_env_vars: true
     restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/influxdb/data:/var/lib/influxdb"
+      - "{{ appdata_path }}/influxdb/config:/etc/influxdb"
+      - "{{ appdata_path }}/influxdb/homeassistant:/backups"
+      - "{{ appdata_path }}/influxdb2/data:/var/lib/influxdb2"
+      - "{{ appdata_path }}/influxdb2/config:/etc/influxdb2"
     ports:
-      - 8080:80
+      - 8086:8086

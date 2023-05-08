@@ -80,5 +80,6 @@
     - role: ironicbadger.proxmox_nag_removal
     - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
+    - role: udelarinterior.proxmox_create_lxc
     
     

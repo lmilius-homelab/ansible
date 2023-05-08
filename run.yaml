@@ -1,0 +1,121 @@
+---
+# Bootstrap hosts
+# - hosts: all
+#   become: true
+#   gather_facts: no
+#   vars_files: vars/vault.yaml
+#   roles:
+#     - envsetup
+
+- hosts: pve1
+  become: true
+  vars_files: vars/vault.yaml
+  roles:
+    - role: geerlingguy.docker
+      vars:
+        docker_users:
+          - deployer
+    - role: docker_config
+      tags: docker_config
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: mount_backup_disk
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: lm-traefik
+      tags: compose
+    - role: docker_compose_up
+      tags: compose
+    # - role: lm-photoprism
+    #   tags: compose
+    # - role: rossmcdonald.telegraf
+    - role: zed_pushover
+    - role: ironicbadger.hddtemp
+    - role: ironicbadger.proxmox_nag_removal
+    - role: ironicbadger.apprise_boot_notification
+    - role: disk_alerts
+
+- hosts: pve2
+  become: true
+  vars_files: vars/vault.yaml
+  roles:
+    - role: geerlingguy.docker
+      vars:
+        docker_users:
+          - deployer
+    - role: docker_config
+      tags: docker_config
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: lm-coraltpu
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: lm-traefik
+      tags: compose
+    - role: lm-frigate-config
+      tags: compose
+    - role: docker_compose_up
+      tags: compose
+    # - role: lm-photoprism
+    #   tags: compose
+    # - role: rossmcdonald.telegraf
+    - role: zed_pushover
+    - role: ironicbadger.hddtemp
+    - role: ironicbadger.proxmox_nag_removal
+    - role: ironicbadger.apprise_boot_notification
+    - role: disk_alerts
+
+- hosts: pve3
+  become: true
+  vars_files: vars/vault.yaml
+  roles:
+    - role: ironicbadger.proxmox_nag_removal
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: zed_pushover
+    - role: ironicbadger.hddtemp
+    - role: ironicbadger.apprise_boot_notification
+    - role: disk_alerts
+    # - role: geerlingguy.docker
+    #   vars:
+    #     docker_users:
+    #       - deployer
+    # - role: docker_config
+    #   tags: docker_config
+    # - role: lm-coraltpu
+    # - role: ironicbadger.docker_compose_generator
+    #   tags: compose
+    # - role: lm-traefik
+    #   tags: compose
+    # - role: lm-frigate-config
+    #   tags: compose
+    # - role: docker_compose_up
+    #   tags: compose
+    # - role: lm-photoprism
+    #   tags: compose
+    # - role: rossmcdonald.telegraf
+  
+- hosts: dockerlxc
+  become: true
+  vars_files: vars/vault.yaml
+  gather_facts: no
+  roles:
+    - role: udelarinterior.proxmox_create_lxc
+
+- hosts: dockerlxc
+  become: true
+  vars_files: vars/vault.yaml
+  gather_facts: yes
+  roles:
+    - role: geerlingguy.docker
+      vars:
+        docker_users:
+          - deployer
+    - role: docker_config
+      tags: docker_config
+    - role: ironicbadger.bash_aliases
+    - role: grog.package
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: docker_compose_up
+      tags: compose

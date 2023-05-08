@@ -87,7 +87,7 @@ package_list:
 #         - "eth0"
 #   - name: sensors
 
-zfs_path: /tank2
+# zfs_path: /tank2
 # ironicbadger.docker_compose_generator
 appdata_path: "/appdata"
 # download_path: /mnt/nvme2tb/downloads

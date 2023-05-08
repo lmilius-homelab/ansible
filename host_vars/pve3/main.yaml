@@ -1,0 +1,38 @@
+---
+ansible_host: "{{ vault_pve3_host_ip }}"
+local_domain: "pve3.{{ vault_domain_name }}"
+
+## telegraf
+telegraf_plugins_base:
+  - name: mem
+  - name: system
+  - name: cpu
+    options:
+      percpu: "true"
+      totalcpu: "true"
+      collect_cpu_time: "false"
+      report_active: "false"
+  - name: disk
+    options:
+      ignore_fs:
+        - "tmpfs"
+        - "devtmpfs"
+        - "devfs"
+      mountpoints:
+        - "/"
+  - name: diskio
+    options:
+      skip_serial_number: "true"
+  - name: kernel
+  - name: processes
+  - name: docker
+    options:
+      endpoint: "unix:///var/run/docker.sock"
+      perdevice: "true"
+  - name: hddtemp
+  - name: net
+    options:
+      interfaces:
+        - "enp0s31f6"
+        - "vmbr0"
+  - name: sensors
