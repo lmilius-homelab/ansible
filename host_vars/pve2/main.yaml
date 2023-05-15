@@ -123,4 +123,5 @@ containers:
     environment:
       - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
     include_global_env_vars: true
+    restart: unless-stopped
   ###
