@@ -1,12 +1,5 @@
 http:
   routers:
-    # router-photoprism:
-    #   entryPoints:
-    #     - websecure
-    #   rule: "Host(`photos.{{ domain_name }}`)"
-    #   service: service-photoprism
-    #   tls:
-    #     certResolver: cloudflare
     router-homeassistant:
       entryPoints:
         - websecure
@@ -14,44 +7,29 @@ http:
       service: service-homeassistant
       tls:
         certResolver: cloudflare
-#    router-blueiris:
-#      entryPoints:
-#        - websecure
-#      rule: "Host(`bi.wd.{{ domain_name }}`)"
-#      service: service-blueiris
-#      tls:
-#        certResolver: cloudflare
-#    router-octoprint:
-#      entryPoints:
-#        - websecure
-#      rule: "Host(`bricktop.{{ domain_name }}`)"
-#      service: service-octoprint
-#      tls:
-#        certResolver: cloudflare
+    router-frigate:
+      entryPoints:
+        - websecure
+      rule: "Host(`frigate.{{ domain_name }}`)"
+      service: service-frigate
+      tls:
+        certResolver: cloudflare
   services:
-    # service-photoprism:
-    #   loadBalancer:
-    #     servers:
-    #     - url: "http://{{ ansible_host }}:2342"
     service-homeassistant:
       loadBalancer:
         servers:
-        - url: "http://10.10.200.10:8123"
-#    service-blueiris:
-#      loadBalancer:
-#        servers:
-#        - url: "http://10.42.1.100:83"
-#    service-octoprint:
-#      loadBalancer:
-#        servers:
-#        - url: "http://192.168.13.16:80"
+        - url: "http://{{ vault_hass_host_ip }}:8123"
+    service-frigate:
+      loadBalancer:
+        servers:
+        - url: "http://{{ vault_pve1_host_ip }}:5000"
   middlewares:
     https-redirect:
       redirectScheme:
         scheme: https
 #    authelia:
 #      forwardAuth:
-#        address: "http://authelia:9091/api/verify?rd=https://login.m.wd.{{ domain_name }}"
+#        address: "http://authelia:9091/api/verify?rd=https://login.{{ domain_name }}"
     default-headers:
       headers:
         frameDeny: true

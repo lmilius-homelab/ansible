@@ -28,7 +28,11 @@ go2rtc:
     cam2:
       - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14/live"
     cam3:
-      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16:8554/unicast"
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16/stream1"
+    cam4:
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.17/stream1"
+    cam5:
+      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream1"
 
 cameras:
   doorbell:
@@ -111,21 +115,52 @@ cameras:
         - person
         - cat
         - dog
-  #cam3:
-  #  ffmpeg:
-  #    inputs:
-  #      - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16:8554/unicast"
-  #        roles:
-  #          - record
-  #          - rtmp
-  #          - detect
-  #  detect:
-  #    fps: 5
-  #  objects:
-  #    track:
-  #      - person
-  #      - cat
-  #      - dog
+  cam3:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16/stream1"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
+  cam4:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.17/stream1"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
+      
+  cam5:
+    ffmpeg:
+      inputs:
+        - path: "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream1"
+          roles:
+            - record
+            - rtmp
+            - detect
+    detect:
+      fps: 5
+    objects:
+      track:
+        - person
+        - cat
+        - dog
 
 objects:
   track:
@@ -160,12 +195,14 @@ record:
       mode: active_objects
 
 detectors:
-  coral1:
-    type: edgetpu
-    device: pci:0
-  coral2:
-    type: edgetpu
-    device: pci:1
+  #coral1:
+  #  type: edgetpu
+  #  device: pci:0
+  #coral2:
+  #  type: edgetpu
+  #  device: pci:1
+  cpu:
+    type: cpu
 
 timestamp_style:
   position: "bl"

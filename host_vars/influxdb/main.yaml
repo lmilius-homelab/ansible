@@ -1,11 +1,13 @@
 ---
 
+ansible_host: "{{ vault_influxdb_ip }}"
+
 #########################################################
 ### Proxmox API connection and authentication section ###
 #########################################################
 pve_default_behavior: no_defaults
 pve_node: pve3
-pve_api_host: 10.10.200.92
+pve_api_host: "{{ vault_pve3_host_ip }}"
 pve_api_user: root@pam
 pve_api_password: "{{ vault_proxmox_api_password }}"
 # pve_api_token_id: root@pam!ansible
@@ -44,7 +46,7 @@ pve_lxc_swap: 512
 pve_lxc_disk: 50
 pve_lxc_storage: local-lvm
 pve_onboot: no
-pve_lxc_searchdomain: milius.home
+pve_lxc_searchdomain: "{{ vault_searchdomain }}"
 pve_lxc_unprivileged: yes
 pve_lxc_force: no
 pve_lxc_features:
@@ -56,7 +58,7 @@ pve_lxc_net_interfaces:
     hwaddr: 3A:A4:62:5E:97:39
     ip4: "{{ vault_influxdb_lxc_ip }}"
     netmask4: "24"
-    gw4: "10.10.200.1"
+    gw4: "{{ vault_gateway_ip }}"
 
 # List of additional mount points and their characteristics
 # pve_lxc_mounts:

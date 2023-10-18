@@ -1,5 +1,5 @@
 ---
-ansible_host: "{{ vault_nvr_host_ip }}"
+ansible_host: "{{ vault_pve2_host_ip }}"
 
 ## telegraf
 telegraf_plugins_base:
@@ -38,12 +38,6 @@ telegraf_plugins_base:
 
 # ironicbadger.docker_compose_generator
 appdata_path: /mnt/video/appdata
-# download_path: /mnt/nvme2tb/downloads
-# media_path: /tank2/media_
-# storage_path: /tank2/archives
-# photoprism_dir: /tank2/photoprism
-# photoprism_db_dir: /tank2/photoprism/database
-# photoprism_compose_output_path: /home/deployer/photoprism
 local_domain: "nvr.{{ vault_domain_name }}"
 
 
