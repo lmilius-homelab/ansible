@@ -7,22 +7,22 @@ http:
       service: service-homeassistant
       tls:
         certResolver: cloudflare
-    router-frigate:
-      entryPoints:
-        - websecure
-      rule: "Host(`frigate.{{ domain_name }}`)"
-      service: service-frigate
-      tls:
-        certResolver: cloudflare
+#    router-frigate:
+#      entryPoints:
+#        - websecure
+#      rule: "Host(`frigate.{{ domain_name }}`)"
+#      service: service-frigate
+#      tls:
+#        certResolver: cloudflare
   services:
     service-homeassistant:
       loadBalancer:
         servers:
         - url: "http://{{ vault_hass_host_ip }}:8123"
-    service-frigate:
-      loadBalancer:
-        servers:
-        - url: "http://{{ vault_pve1_host_ip }}:5000"
+#    service-frigate:
+#      loadBalancer:
+#        servers:
+#        - url: "http://{{ vault_pve1_host_ip }}:5000"
   middlewares:
     https-redirect:
       redirectScheme:

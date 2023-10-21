@@ -62,50 +62,71 @@ backup_drive: "/mnt/backups/BACKUPS"
 backup_disk_uuid: "{{ vault_backup_disk_uuid }}"
 
 # frigate
-frigate_config_filepath: "{{ nvr_path }}/frigate"
-frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
-frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
-frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
-frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
-rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
-rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
-camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
+# frigate_config_filepath: "{{ nvr_path }}/frigate"
+# frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
+# frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
+# frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
+# frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
+# rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
+# rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
+# camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
 
 
-containers:
+# containers:
   ###
-  - service_name: frigate
-    active: true
-    privileged: true
-    image: ghcr.io/blakeblackshear/frigate:stable
-    shm_size: 256m
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.http.routers.frigate.entrypoints=websecure"
-    #   - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
-    #   - "traefik.http.services.frigate.loadbalancer.server.port=5000"
-    devices:
-      - /dev/dri/renderD128
-      # - /dev/apex_0:/dev/apex_0
-      # - /dev/apex_1:/dev/apex_1
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"
-      - "{{ frigate_config_filepath }}/media:/media/frigate"
-      - "{{ frigate_config_filepath }}/database:/config/db"
-      # - "/dev/dri:/dev/dri"
-      - type: tmpfs # Option: 2GB of memory, reduces SSD wear
-        target: /tmp/cache
-        tmpfs:
-          size: 2000000000
-    ports:
-      - "1935:1935"
-      - "5000:5000"
-      - "8554:8554" # RTSP feeds
-      - "8555:8555/tcp" # WebRTC over tcp
-      - "8555:8555/udp" # WebRTC over udp
-    environment:
-      - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
-    include_global_env_vars: true
-    restart: unless-stopped
+  # - service_name: frigate
+  #   active: true
+  #   privileged: true
+  #   image: ghcr.io/blakeblackshear/frigate:stable
+  #   shm_size: 256m
+  #   # labels:
+  #   #   - "traefik.enable=true"
+  #   #   - "traefik.http.routers.frigate.entrypoints=websecure"
+  #   #   - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
+  #   #   - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+  #   devices:
+  #     - /dev/dri/renderD128
+  #     # - /dev/apex_0:/dev/apex_0
+  #     # - /dev/apex_1:/dev/apex_1
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"
+  #     - "{{ frigate_config_filepath }}/media:/media/frigate"
+  #     - "{{ frigate_config_filepath }}/database:/config/db"
+  #     # - "/dev/dri:/dev/dri"
+  #     - type: tmpfs # Option: 2GB of memory, reduces SSD wear
+  #       target: /tmp/cache
+  #       tmpfs:
+  #         size: 2000000000
+  #   ports:
+  #     - "1935:1935"
+  #     - "5000:5000"
+  #     - "8554:8554" # RTSP feeds
+  #     - "8555:8555/tcp" # WebRTC over tcp
+  #     - "8555:8555/udp" # WebRTC over udp
+  #   environment:
+  #     - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+  #   include_global_env_vars: true
+  #   restart: unless-stopped
   ###
+  # - service_name: jellyfin
+  #   active: true
+  #   image: jellyfin/jellyfin
+  #   devices:
+  #     - /dev/dri:/dev/dri
+  #   # labels:
+  #   #   - traefik.enable=true
+  #   #   - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ local_domain }}`)"
+  #   #   - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+  #   volumes:
+  #     - "{{ appdata_path }}/jellyfin:/config"
+  #     - "{{ media_path }}books:/data/books"
+  #     - "{{ media_path }}movies:/data/movies"
+  #     - "{{ media_path }}tvshows:/data/tvshows"
+  #     - "{{ media_path }}videos:/data/videos"
+  #   # environment:
+  #     # - "JELLYFIN_PublishedServerUrl=jellyfin.{{ local_domain }}"
+  #   ports:
+  #     - "8096:8096"
+  #   include_global_env_vars: true
+  #   restart: unless-stopped

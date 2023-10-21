@@ -37,6 +37,10 @@ package_list:
 - name: nmap
 - name: intel-gpu-tools
 - name: ffmpeg
+- name: vainfo
+- name: lshw
+- name: pciutils
+- name: intel-media-va-driver
 
 # ironicbadger.docker_compose_generator
 appdata_path: "/appdata"

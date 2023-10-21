@@ -50,6 +50,10 @@ package_list:
 - name: nfs-kernel-server
 - name: zfsutils-linux
 - name: ffmpeg
+- name: vainfo
+- name: lshw
+- name: pciutils
+- name: intel-media-va-driver
 
 ## telegraf
 telegraf_plugins_base:

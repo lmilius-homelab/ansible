@@ -82,7 +82,13 @@ pve_lxc_additional_configurations:
     line: "mp0: {{ nvr_path }},mp={{ nvr_path }}"
     state: present
   - regexp: '^lxc.mount.entry: /dev/dri'
-    line: "lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file 0,0"
+    line: "lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir 0,0"
+    state: present
+  - regexp: '^lxc.cgroup2.devices.allow: c 226:0 rwm'
+    line: "lxc.cgroup2.devices.allow: c 226:0 rwm"
+    state: present
+  - regexp: '^lxc.cgroup2.devices.allow: c 226:128 rwm'
+    line: "lxc.cgroup2.devices.allow: c 226:128 rwm"
     state: present
   # - regexp: '^lxc.mount.entry: /dev/apex_0'
   #   line: "lxc.mount.entry: /dev/apex_0 dev/apex_0 none bind,optional,create=file"

@@ -59,6 +59,10 @@ pve_lxc_net_interfaces:
     hwaddr: FE:A8:38:9A:43:EB
     ip4: dhcp
 
+
+#https://gist.github.com/scyto/e4e3de35ee23fdb4ae5d5a3b85c16ed3#file-vgpu-container-privileged-md
+
+
 # List of additional mount points and their characteristics
 # pve_lxc_mounts:
 #   - id: mp1
@@ -107,6 +111,12 @@ pve_lxc_additional_configurations:
     state: present
   - regexp: '^lxc.mount.entry /dev/dri'
     line: "lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir 0,0"
+    state: present
+  - regexp: '^lxc.cgroup2.devices.allow: c 226:0 rwm'
+    line: "lxc.cgroup2.devices.allow: c 226:0 rwm"
+    state: present
+  - regexp: '^lxc.cgroup2.devices.allow: c 226:128 rwm'
+    line: "lxc.cgroup2.devices.allow: c 226:128 rwm"
     state: present
 
 
@@ -602,18 +612,18 @@ containers:
       - "{{ media_path }}videos/metube:/downloads"
     include_global_env_vars: true
 
-  - service_name: dashy
-    active: true
-    image: ghcr.io/lissy93/dashy:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.dashy.rule=Host(`home.{{ local_domain }}`)
-      - traefik.http.services.dashy.loadbalancer.server.port=80
-    volumes:
-      - "{{ appdata_path }}/dashy/conf.yml:/app/public/conf.yml"
-      # - "{{ appdata_path }}/dashy/dist:/app/dist"
-    restart: "unless-stopped"
-    include_global_env_vars: true
+  # - service_name: dashy
+  #   active: true
+  #   image: ghcr.io/lissy93/dashy:latest
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.dashy.rule=Host(`home.{{ local_domain }}`)
+  #     - traefik.http.services.dashy.loadbalancer.server.port=80
+  #   volumes:
+  #     - "{{ appdata_path }}/dashy/conf.yml:/app/public/conf.yml"
+  #     # - "{{ appdata_path }}/dashy/dist:/app/dist"
+  #   restart: "unless-stopped"
+  #   include_global_env_vars: true
 
   - service_name: joplin
     active: true
@@ -715,5 +725,16 @@ containers:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     include_global_env_vars: true
     restart: "unless-stopped"
+
+  - service_name: heimdall
+    active: true
+    image: lscr.io/linuxserver/heimdall:latest
+    volumes:
+      - "{{ appdata_path }}/heimdall/config:/config"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.heimdall.rule=Host(`home.{{ local_domain }}`)"
+    include_global_env_vars: true
+    restart: unless-stopped
     
     
