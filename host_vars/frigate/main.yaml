@@ -32,8 +32,8 @@ pve_lxc_vmid: 111
 pve_lxc_description: |
   This host is a Debian 12 container configured via Ansible with:
   - Unlimited CPU cores
-  "- {{ pve_lxc_memory }} MB of RAM"
-  "- {{ pve_lxc_disk }} GB of system disk"
+  - {{ pve_lxc_memory }} MB of RAM
+  - {{ pve_lxc_disk }} GB of system disk
   - unprivileged: no
   - onboot: yes
 pve_lxc_root_password: "{{ vault_dockerlxc_root_password }}"
@@ -84,18 +84,18 @@ pve_lxc_additional_configurations:
   - regexp: '^lxc.mount.entry: /dev/dri'
     line: "lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir 0,0"
     state: present
-  - regexp: '^lxc.cgroup2.devices.allow: c 226:0 rwm'
-    line: "lxc.cgroup2.devices.allow: c 226:0 rwm"
+  - regexp: '^lxc.cgroup2.devices.allow: c 226:* rwm'
+    line: "lxc.cgroup2.devices.allow: c 226:* rwm"
     state: present
-  - regexp: '^lxc.cgroup2.devices.allow: c 226:128 rwm'
-    line: "lxc.cgroup2.devices.allow: c 226:128 rwm"
+  - regexp: '^lxc.cgroup2.devices.allow: c 120:* rwm'
+    line: "lxc.cgroup2.devices.allow: c 120:* rwm"
     state: present
-  # - regexp: '^lxc.mount.entry: /dev/apex_0'
-  #   line: "lxc.mount.entry: /dev/apex_0 dev/apex_0 none bind,optional,create=file"
-  #   state: present
-  # - regexp: '^lxc.mount.entry: /dev/apex_1'
-  #   line: "lxc.mount.entry: /dev/apex_1 dev/apex_1 none bind,optional,create=file"
-  #   state: present
+  - regexp: '^lxc.mount.entry: /dev/apex_0'
+    line: "lxc.mount.entry: /dev/apex_0 dev/apex_0 none bind,optional,create=file"
+    state: present
+  - regexp: '^lxc.mount.entry: /dev/apex_1'
+    line: "lxc.mount.entry: /dev/apex_1 dev/apex_1 none bind,optional,create=file"
+    state: present
 
 
 zfs_path: /tank2
@@ -164,8 +164,8 @@ containers:
       - "traefik.http.services.frigate.loadbalancer.server.port=5000"
     devices:
       - /dev/dri/renderD128
-      # - /dev/apex_0:/dev/apex_0
-      # - /dev/apex_1:/dev/apex_1
+      - /dev/apex_0:/dev/apex_0
+      - /dev/apex_1:/dev/apex_1
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"

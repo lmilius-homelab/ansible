@@ -11,6 +11,13 @@
     state: present
     filename: coral-edgetpu
 
+- name: Update pve kernel headers
+  ansible.builtin.apt:
+    pkg:
+    - pve-headers-{{ ansible_kernel }}
+    update_cache: yes
+  when: '"pve" in ansible_host'
+
 - name: Update repositories cache and install drivers package
   ansible.builtin.apt:
     pkg: 

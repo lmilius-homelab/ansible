@@ -56,6 +56,8 @@ cameras:
         objects:
           - person
           - car
+    ui:
+      order: 0
 
   cam1:
     ffmpeg:
@@ -172,14 +174,14 @@ ui:
   live_mode: webrtc
 
 detectors:
-  #coral1:
-  #  type: edgetpu
-  #  device: pci:0
-  #coral2:
-  #  type: edgetpu
-  #  device: pci:1
-  cpu:
-    type: cpu
+  coral1:
+    type: edgetpu
+    device: pci:0
+  coral2:
+    type: edgetpu
+    device: pci:1
+  #cpu:
+  #  type: cpu
 
 timestamp_style:
   position: "bl"
