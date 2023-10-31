@@ -21,12 +21,14 @@
     - role: grog.package
     - role: lm-coraltpu
     - role: mount_backup_disk
-    # - role: ironicbadger.docker_compose_generator
-    #   tags: compose
-    # - role: lm-frigate-config
-    #   tags: compose
-    # - role: docker_compose_up
-    #   tags: compose
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: lm-traefik
+      tags: compose
+    - role: lm-frigate-config
+      tags: compose
+    - role: docker_compose_up
+      tags: compose
     # - role: rossmcdonald.telegraf
     #   tags: telegraf
     - role: zed_pushover
@@ -97,7 +99,10 @@
     - role: ironicbadger.bash_aliases
     - role: grog.package
 
-- hosts: docker-prod-01
+- hosts: 
+  - docker-prod-01
+  - frigate
+  - kms
   become: true
   vars_files: vars/vault.yaml
   gather_facts: yes
@@ -111,8 +116,6 @@
   gather_facts: yes
   roles:
     - role: lm-coraltpu
-    - role: lm-traefik
-      tags: compose
     - role: lm-frigate-config
       tags: compose
 
