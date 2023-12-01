@@ -8,18 +8,19 @@ database:
   
 ffmpeg:
   hwaccel_args: preset-vaapi
-  output_args:
-    record: preset-record-generic-audio-aac
+  #output_args:
+  #  record: preset-record-generic-audio-aac
 
 go2rtc:
   webrtc:
     candidates:
       - "{{ vault_frigate_ip }}:8555"
+      - "{{ vault_pve1_host_ip }}:8555"
       - stun:8555
   streams:
     doorbell:
       - "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
-      - "ffmpeg:doorbell#audio=aac"
+    #  - "ffmpeg:doorbell#audio=aac"
     #cam1:
     #  - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
     #  - "ffmpeg:cam1#audio=aac"
@@ -28,13 +29,13 @@ go2rtc:
     #  - "ffmpeg:cam2#audio=aac"
     cam3:
       - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16/stream1"
-      - "ffmpeg:cam3#audio=aac"
+    #  - "ffmpeg:cam3#audio=aac"
     cam4:
       - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.17/stream1"
-      - "ffmpeg:cam4#audio=aac"
+    #  - "ffmpeg:cam4#audio=aac"
     cam5:
       - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream1"
-      - "ffmpeg:cam5#audio=aac"
+    #  - "ffmpeg:cam5#audio=aac"
 
 cameras:
   doorbell:
