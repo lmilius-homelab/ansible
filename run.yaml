@@ -21,14 +21,14 @@
     - role: grog.package
     - role: lm-coraltpu
     - role: mount_backup_disk
-    - role: ironicbadger.docker_compose_generator
-      tags: compose
-    - role: lm-traefik
-      tags: compose
-    - role: lm-frigate-config
-      tags: compose
-    - role: docker_compose_up
-      tags: compose
+    # - role: ironicbadger.docker_compose_generator
+    #   tags: compose
+    # - role: lm-traefik
+    #   tags: compose
+    # - role: lm-frigate-config
+    #   tags: compose
+    # - role: docker_compose_up
+    #   tags: compose
     # - role: rossmcdonald.telegraf
     #   tags: telegraf
     - role: zed_pushover
