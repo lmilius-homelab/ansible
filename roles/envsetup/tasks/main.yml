@@ -28,4 +28,5 @@
     authorized_key:
       user: deployer
       state: present
-      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      key: "{{ vault_ssh_pub_key }}"
+      # key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

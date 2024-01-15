@@ -1,15 +1,35 @@
 ---
+# Install ssh key
+# - hosts: local
+#   gather_facts: yes
+#   tasks:
+#     - name: Ensure .ssh directory exists
+#       file:
+#         dest: "~/.ssh"
+#         mode: 0700
+#         owner: "{{ ansible_user_id }}"
+#         state: directory
+    
+#     - name: Install ssh key
+#       copy:
+#         src: ./ssh_key
+#         dest: "~/.ssh/id_rsa"
+#         mode: 0600
+#         owner: "{{ ansible_user_id }}"
+
 # Bootstrap hosts
 # - hosts: all
 #   become: true
 #   gather_facts: no
-#   vars_files: vars/vault.yaml
+#   vars_files:
+#     - vars/vault.yaml
 #   roles:
 #     - envsetup
 
 - hosts: pve1
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   roles:
     - role: geerlingguy.docker
       vars:
@@ -39,7 +59,8 @@
 
 - hosts: pve2
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   roles:
     - role: geerlingguy.docker
       vars:
@@ -67,7 +88,8 @@
 
 - hosts: pve3
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   roles:
     - role: ironicbadger.proxmox_nag_removal
     - role: ironicbadger.bash_aliases
@@ -80,14 +102,16 @@
   
 - hosts: dockerlxc
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   gather_facts: no
   roles:
     - role: udelarinterior.proxmox_create_lxc
 
 - hosts: dockerlxc
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   gather_facts: yes
   roles:
     - role: geerlingguy.docker
@@ -105,7 +129,8 @@
   - kms
   - media
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   gather_facts: yes
   roles:
     - role: lm-traefik
@@ -123,7 +148,8 @@
 
 - hosts: dockerlxc
   become: true
-  vars_files: vars/vault.yaml
+  vars_files:
+    - vars/vault.yaml
   gather_facts: yes
   roles:
     - role: ironicbadger.docker_compose_generator
