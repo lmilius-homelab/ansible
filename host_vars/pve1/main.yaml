@@ -66,7 +66,8 @@ backup_disk_uuid: "{{ vault_backup_disk_uuid }}"
 traefik_config_filepath: "{{ nvr_path }}/traefik"
 
 # frigate
-frigate_config_filepath: "{{ nvr_path }}/frigate"
+frigate_filepath: "{{ nvr_path }}/frigate"
+frigate_config_filepath: "{{ frigate_filepath }}/config"
 frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
 frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
 frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
@@ -115,9 +116,10 @@ containers:
       - /dev/apex_1:/dev/apex_1
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - "{{ frigate_config_filepath }}/frigate.yml:/config/config.yml"
-      - "{{ frigate_config_filepath }}/media:/media/frigate"
-      - "{{ frigate_config_filepath }}/database:/config/db"
+      - "{{ frigate_config_filepath }}:/config"
+      # - "{{ frigate_config_filepath }}/config.yml:/config/config.yml"
+      - "{{ frigate_filepath }}/media:/media/frigate"
+      - "{{ frigate_filepath }}/database:/config/db"
       # - "/dev/dri:/dev/dri"
       - type: tmpfs # Option: 2GB of memory, reduces SSD wear
         target: /tmp/cache
@@ -125,6 +127,7 @@ containers:
           size: 2000000000
     ports:
       - "1935:1935"
+      - "1984:1984" # go2rtc http api
       - "5000:5000"
       - "8554:8554" # RTSP feeds
       - "8555:8555/tcp" # WebRTC over tcp

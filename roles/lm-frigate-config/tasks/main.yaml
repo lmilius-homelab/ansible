@@ -9,7 +9,7 @@
 - name: template frigate config
   ansible.builtin.template:
     src: templates/frigate.yml.j2
-    dest: "{{ frigate_config_filepath }}/frigate.yml"
+    dest: "{{ frigate_config_filepath }}/config.yml"
     force: yes
     # unsafe_writes: yes
     # backup: yes
