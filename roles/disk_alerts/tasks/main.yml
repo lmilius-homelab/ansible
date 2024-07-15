@@ -23,3 +23,4 @@
     name: "hard drive temp alerts"
     minute: "*/30"
     job: /bin/bash /root/hd.sh
+    state: absent

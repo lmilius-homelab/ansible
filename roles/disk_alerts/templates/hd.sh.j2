@@ -2,7 +2,7 @@
 
 CRIT_TEMP_LEVEL={{ hd_alert_temp }}
 
-t=($(hddtemp /dev/sd[a,b,c,d,e,f,g,h,i,j,k,l,m,n] --numeric --quiet))
+t=($(hddtemp))
 
 temp_high=False
 

@@ -38,7 +38,7 @@ pve_lxc_description: |
   - onboot: no
   Designed to run influxdb for the smart home
 pve_lxc_root_password: "{{ vault_influxdb_lxc_root_password }}"
-pve_lxc_root_authorized_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+pve_lxc_root_authorized_pubkey: "{{ lookup('file', '~/.ssh/ansible_key.pub') }}"
 
 pve_lxc_cpu_cores: 2
 pve_lxc_memory: 1024

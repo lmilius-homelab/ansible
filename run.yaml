@@ -13,7 +13,7 @@
 #     - name: Install ssh key
 #       copy:
 #         src: ./ssh_key
-#         dest: "~/.ssh/id_rsa"
+#         dest: "~/.ssh/ansible_key"
 #         mode: 0600
 #         owner: "{{ ansible_user_id }}"
 
@@ -39,6 +39,7 @@
       tags: docker_config
     - role: ironicbadger.bash_aliases
     - role: grog.package
+    - role: lm-hddtemp
     - role: lm-coraltpu
     - role: mount_backup_disk
     - role: ironicbadger.docker_compose_generator
@@ -52,9 +53,8 @@
     # - role: rossmcdonald.telegraf
     #   tags: telegraf
     - role: zed_pushover
-    - role: ironicbadger.hddtemp
     - role: ironicbadger.proxmox_nag_removal
-    - role: ironicbadger.apprise_boot_notification
+    # - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
 
 - hosts: pve2
@@ -70,6 +70,7 @@
       tags: docker_config
     - role: ironicbadger.bash_aliases
     - role: grog.package
+    - role: lm-hddtemp
     # - role: lm-coraltpu
     # - role: ironicbadger.docker_compose_generator
     #   tags: compose
@@ -81,9 +82,8 @@
     #   tags: compose
     # - role: rossmcdonald.telegraf
     - role: zed_pushover
-    - role: ironicbadger.hddtemp
     - role: ironicbadger.proxmox_nag_removal
-    - role: ironicbadger.apprise_boot_notification
+    # - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
 
 - hosts: pve3
@@ -92,11 +92,11 @@
     - vars/vault.yaml
   roles:
     - role: ironicbadger.proxmox_nag_removal
+    - role: lm-hddtemp
     - role: ironicbadger.bash_aliases
     - role: grog.package
     - role: zed_pushover
-    - role: ironicbadger.hddtemp
-    - role: ironicbadger.apprise_boot_notification
+    # - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
     # - role: rossmcdonald.telegraf
   

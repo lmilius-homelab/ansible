@@ -29,4 +29,4 @@
       user: deployer
       state: present
       key: "{{ vault_ssh_pub_key }}"
-      # key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      # key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/ansible_key.pub') }}"
