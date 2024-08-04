@@ -11,6 +11,14 @@ ffmpeg:
   output_args:
     record: preset-record-generic-audio-aac
 
+audio:
+  enabled: true
+  listen:
+    - bark
+    - fire_alarm
+    - crying
+
+
 go2rtc:
   webrtc:
     candidates:
@@ -21,9 +29,9 @@ go2rtc:
     doorbell:
       - "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif#backchannel=0"
       - "ffmpeg:doorbell#audio=aac"
-    cam1:
-      - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
-      - "ffmpeg:cam1#audio=aac"
+    #cam1:
+    #  - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+    #  - "ffmpeg:cam1#audio=aac"
     #cam2:
     #  - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14/live"
     #  - "ffmpeg:cam2#audio=aac"
@@ -46,6 +54,7 @@ cameras:
           roles:
             - record
             - detect
+            - audio
     detect:
       fps: 5
     zones:
@@ -61,21 +70,21 @@ cameras:
     ui:
       order: 0
 
-  cam1:
-    ffmpeg:
-      inputs:
-        - path: "rtsp://127.0.0.1:8554/cam1"
-          input_args: preset-rtsp-restream
-          roles:
-            - record
-            - detect
-    detect:
-      fps: 5
-    objects:
-      track:
-        - person
-        - cat
-        - dog
+  #cam1:
+  #  ffmpeg:
+  #    inputs:
+  #      - path: "rtsp://127.0.0.1:8554/cam1"
+  #        input_args: preset-rtsp-restream
+  #        roles:
+  #          - record
+  #          - detect
+  #  detect:
+  #    fps: 5
+  #  objects:
+  #    track:
+  #      - person
+  #      - cat
+  #      - dog
   
   #cam2:
   #  ffmpeg:
@@ -101,6 +110,7 @@ cameras:
           roles:
             - record
             - detect
+            - audio
     detect:
       fps: 5
     objects:
@@ -116,6 +126,7 @@ cameras:
           roles:
             - record
             - detect
+            - audio
     detect:
       fps: 5
     objects:
@@ -132,6 +143,7 @@ cameras:
           roles:
             - record
             - detect
+            - audio
     detect:
       fps: 5
     objects:

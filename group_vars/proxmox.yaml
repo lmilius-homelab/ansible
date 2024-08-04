@@ -30,7 +30,6 @@ influxdb_ip: 127.0.0.1
 package_list:
 - name: curl
 - name: git
-- name: hddtemp
 - name: parted
 - name: htop
 - name: iftop

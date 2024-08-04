@@ -41,6 +41,7 @@
     - role: grog.package
     - role: lm-hddtemp
     - role: lm-coraltpu
+      tags: tpu
     - role: mount_backup_disk
     - role: ironicbadger.docker_compose_generator
       tags: compose
@@ -56,6 +57,8 @@
     - role: ironicbadger.proxmox_nag_removal
     # - role: ironicbadger.apprise_boot_notification
     - role: disk_alerts
+    - role: dbrennand.autorestic
+      tags: backups
 
 - hosts: pve2
   become: true

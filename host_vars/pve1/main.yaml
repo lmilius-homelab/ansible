@@ -76,6 +76,31 @@ rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
 rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
 camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
 
+apprise_path: "/usr/local/bin/apprise"
+
+# autorestic
+autorestic_version: 1.8.2
+autorestic_restic_version: 0.17.0
+
+autorestic_config:
+  version: 2
+  locations:
+    laptop_homes:
+      type: local
+      from: 
+        - /tank2/backups/t480s
+        - /tank2/backups/x1carbon
+      to: 
+        - local_external
+        # - remote
+      cron: "0 0 * * *"
+      hooks:
+        failure: "{{ apprise_path }} -t Laptop Homes Backup Failed -b Backup of laptop homes from NAS to external drive failed. pover://{{ pushover_user_key }}@{{ pushover_api_bootlace }}"
+        success: "{{ apprise_path }} -t Laptop Homes Backup Successful -b Backup of laptop homes from NAS to external drive was successful. pover://{{ pushover_user_key }}@{{ pushover_api_bootlace }}" 
+  backends:
+    local_external:
+      type: local
+      path: /mnt/backups/BACKUPS/autorestic
 
 containers:
   ###
