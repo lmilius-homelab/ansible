@@ -1,29 +1,45 @@
 ---
 
-- name: Add google gpg signing key, uses whichever key is at the URL
-  ansible.builtin.apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
+# - name: Add google gpg signing key, uses whichever key is at the URL
+#   ansible.builtin.apt_key:
+#     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+#     # state: present
+#     state: absent
 
-- name: Add coral repository into sources list
-  ansible.builtin.apt_repository:
-    repo: deb https://packages.cloud.google.com/apt coral-edgetpu-stable main
-    state: present
-    filename: coral-edgetpu
+# - name: Add coral repository into sources list
+#   ansible.builtin.apt_repository:
+#     repo: deb https://packages.cloud.google.com/apt coral-edgetpu-stable main
+#     # state: present
+#     state: absent
+#     filename: coral-edgetpu
 
-- name: Update pve kernel headers
-  ansible.builtin.apt:
-    pkg:
-    - pve-headers-{{ ansible_kernel }}
-    update_cache: yes
-  when: '"pve" in ansible_host'
+# - name: Update pve kernel headers
+#   ansible.builtin.apt:
+#     pkg:
+#     - pve-headers-{{ ansible_kernel }}
+#     - pve-headers
+#     - devscripts
+#     - debhelper
+#     update_cache: yes
+#   when: '"pve" in ansible_host'
 
-- name: Update repositories cache and install drivers package
-  ansible.builtin.apt:
-    pkg: 
-    - gasket-dkms
-    - libedgetpu1-std
-    update_cache: yes
+# - name: Clone gasket driver repo
+
+# - name: Build gasket deb
+
+# - name: Install gasket deb package
+#   register: install_deb
+
+
+
+# reboot and wait to come back if deb was changed?
+
+# - name: Update repositories cache and install drivers package
+#   ansible.builtin.apt:
+#     pkg: 
+#     - gasket-dkms
+#     - libedgetpu1-std
+#     update_cache: yes
 
 - name: ensure target dir exists
   file:

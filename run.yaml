@@ -48,7 +48,9 @@
     - role: lm-traefik
       tags: compose
     - role: lm-frigate-config
-      tags: compose
+      tags: 
+        - compose
+        - frigate_config
     - role: docker_compose_up
       tags: compose
     # - role: rossmcdonald.telegraf
@@ -129,8 +131,8 @@
 - hosts: 
   - docker-prod-01
   # - frigate
-  - kms
-  - media
+  # - kms
+  # - media
   become: true
   vars_files:
     - vars/vault.yaml

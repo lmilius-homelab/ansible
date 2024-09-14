@@ -4,7 +4,7 @@ mqtt:
   password: "{{ frigate_mqtt_password }}"
 
 database:
-  path: /config/frigate.db
+  path: /config/db/frigate.db
   
 ffmpeg:
   hwaccel_args: preset-vaapi
@@ -18,6 +18,7 @@ audio:
     - fire_alarm
     - crying
 
+
 go2rtc:
   webrtc:
     candidates:
@@ -28,6 +29,12 @@ go2rtc:
     doorbell:
       - "rtsp://{{ rtsp_camera_username }}:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif#backchannel=0"
       - "ffmpeg:doorbell#audio=aac"
+    #cam1:
+    #  - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.13/live"
+    #  - "ffmpeg:cam1#audio=aac"
+    #cam2:
+    #  - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.14/live"
+    #  - "ffmpeg:cam2#audio=aac"
     cam3:
       - "rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16/stream1"
       - "ffmpeg:cam3#audio=aac"
@@ -49,9 +56,51 @@ cameras:
             - detect
             - audio
     detect:
-      fps: 5      
+      fps: 5
+    zones:
+      driveway:
+        coordinates: 523,1243,238,1179,235,1286
+        objects:
+          - person
+          - car
+      porch:
+        coordinates: 221,1450,1217,1563,2176,1453,2560,1550,2560,1920,1735,1920,289,1920
+        objects:
+          - person        
     ui:
       order: 0
+
+  #cam1:
+  #  ffmpeg:
+  #    inputs:
+  #      - path: "rtsp://127.0.0.1:8554/cam1"
+  #        input_args: preset-rtsp-restream
+  #        roles:
+  #          - record
+  #          - detect
+  #  detect:
+  #    fps: 5
+  #  objects:
+  #    track:
+  #      - person
+  #      - cat
+  #      - dog
+  
+  #cam2:
+  #  ffmpeg:
+  #    inputs:
+  #      - path: "rtsp://127.0.0.1:8554/cam2"
+  #        input_args: preset-rtsp-restream
+  #        roles:
+  #          - record
+  #          - detect
+  #  detect:
+  #    fps: 5
+  #  objects:
+  #    track:
+  #      - person
+  #      - cat
+  #      - dog
 
   cam3:
     ffmpeg:
@@ -69,8 +118,6 @@ cameras:
         - person
         - cat
         - dog
-    ui:
-      order: 10
   cam4:
     ffmpeg:
       inputs:
@@ -87,8 +134,6 @@ cameras:
         - person
         - cat
         - dog
-    ui:
-      order: 10
       
   cam5:
     ffmpeg:
@@ -106,8 +151,6 @@ cameras:
         - person
         - cat
         - dog
-    ui:
-      order: 10
 
 objects:
   track:
@@ -117,7 +160,7 @@ objects:
     - cat
 
 birdseye:
-  enabled: True
+  enabled: true
   width: 1920
   height: 1080
   quality: 8
@@ -141,10 +184,8 @@ record:
       default: 30
       mode: active_objects
 
-telemetry:
-  stats:
-    intel_gpu_stats: True
-    network_bandwidth: True
+ui:
+  live_mode: webrtc
 
 detectors:
   coral1:

@@ -142,10 +142,7 @@ containers:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - "{{ frigate_config_filepath }}:/config"
-      # - "{{ frigate_config_filepath }}/config.yml:/config/config.yml"
       - "{{ frigate_filepath }}/media:/media/frigate"
-      - "{{ frigate_filepath }}/database:/config/db"
-      # - "/dev/dri:/dev/dri"
       - type: tmpfs # Option: 2GB of memory, reduces SSD wear
         target: /tmp/cache
         tmpfs:
