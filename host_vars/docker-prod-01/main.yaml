@@ -360,7 +360,7 @@ containers:
   - service_name: nextcloud
     active: true
     restart: unless-stopped
-    image: nextcloud:stable
+    image: nextcloud:29.0.7
     depends_on:
       - nextcloud_mariadb
       - nextcloud_redis
