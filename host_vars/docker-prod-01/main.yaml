@@ -145,7 +145,7 @@ containers:
   ###
   - service_name: traefik
     active: true
-    image: traefik
+    image: traefik:v2.10.7
     ports:
       - 80:80
       - 443:443
@@ -175,7 +175,7 @@ containers:
   ###
   - service_name: librespeed
     active: true
-    image: linuxserver/librespeed
+    image: linuxserver/librespeed:5.4.1
     labels:
       - traefik.enable=true
       - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"
@@ -187,7 +187,7 @@ containers:
   ###
   - service_name: filebrowser
     active: true
-    image: filebrowser/filebrowser:s6
+    image: filebrowser/filebrowser:v2.31.2-s6
     labels:
       - traefik.enable=true
       - "traefik.http.routers.fb.rule=Host(`files.{{ local_domain }}`)"
@@ -200,7 +200,7 @@ containers:
   ###
   - service_name: jellyfin
     active: true
-    image: jellyfin/jellyfin
+    image: jellyfin/jellyfin:2024100705
     devices:
       - /dev/dri:/dev/dri
     labels:
@@ -233,7 +233,7 @@ containers:
     # docker-compose exec photoprism photoprism faces index
   - service_name: photoprism
     active: true
-    image: photoprism/photoprism:latest
+    image: photoprism/photoprism:240915
     depends_on:
       - photoprism_mariadb
     security_opt:
@@ -333,7 +333,7 @@ containers:
   - service_name: duplicati
     active: true
     restart: unless-stopped
-    image: lscr.io/linuxserver/duplicati:latest
+    image: lscr.io/linuxserver/duplicati:2.0.8
     labels:
       - traefik.enable=true
       - "traefik.http.routers.duplicati.rule=Host(`backups.{{ local_domain }}`)"
@@ -347,7 +347,7 @@ containers:
   - service_name: portainer
     active: true
     restart: unless-stopped
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.22.0
     labels:
       - traefik.enable=true
       - "traefik.http.routers.portainer.rule=Host(`portainer.{{ local_domain }}`)"
@@ -403,7 +403,7 @@ containers:
   - service_name: paperless
     active: true
     restart: unless-stopped
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.12.1
     depends_on: 
       - paperless_redis
     labels:
@@ -429,7 +429,7 @@ containers:
 
   - service_name: mealie
     active: true
-    image: hkotel/mealie
+    image: hkotel/mealie:v1.12.0
     labels:
       - traefik.enable=true
       - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
@@ -442,34 +442,34 @@ containers:
     restart: unless-stopped
     include_global_env_vars: true
 
-  - service_name: wordpress-shop
-    active: true
-    image: wordpress
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.wordpress-shop.rule=Host(`shop.{{ local_domain }}`)
-    environment:
-      - WORDPRESS_DB_HOST=shopdb
-      - WORDPRESS_DB_USER=shopdb
-      - "WORDPRESS_DB_PASSWORD={{ wordpress_shop_db_password }}"
-      - WORDPRESS_DB_NAME=shopdb
-    volumes:
-      - "{{ appdata_path }}/wordpress-shop/data:/var/www/html"
-    restart: unless-stopped
-    depends_on:
-      - shopdb
+  # - service_name: wordpress-shop
+  #   active: true
+  #   image: wordpress
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.wordpress-shop.rule=Host(`shop.{{ local_domain }}`)
+  #   environment:
+  #     - WORDPRESS_DB_HOST=shopdb
+  #     - WORDPRESS_DB_USER=shopdb
+  #     - "WORDPRESS_DB_PASSWORD={{ wordpress_shop_db_password }}"
+  #     - WORDPRESS_DB_NAME=shopdb
+  #   volumes:
+  #     - "{{ appdata_path }}/wordpress-shop/data:/var/www/html"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - shopdb
 
-  - service_name: shopdb
-    active: true
-    image: mysql:5.7
-    environment:
-      - MYSQL_DATABASE=shopdb
-      - MYSQL_USER=shopdb
-      - "MYSQL_PASSWORD={{ wordpress_shop_db_password }}"
-      - MYSQL_RANDOM_ROOT_PASSWORD={{ wordpress_shop_root_db_password }}
-    volumes:
-      - "{{ appdata_path }}/wordpress-shop/db:/var/lib/mysql"
-    restart: unless-stopped
+  # - service_name: shopdb
+  #   active: true
+  #   image: mysql:5.7
+  #   environment:
+  #     - MYSQL_DATABASE=shopdb
+  #     - MYSQL_USER=shopdb
+  #     - "MYSQL_PASSWORD={{ wordpress_shop_db_password }}"
+  #     - MYSQL_RANDOM_ROOT_PASSWORD={{ wordpress_shop_root_db_password }}
+  #   volumes:
+  #     - "{{ appdata_path }}/wordpress-shop/db:/var/lib/mysql"
+  #   restart: unless-stopped
 
   # - service_name: peertube
   #   active: true
@@ -521,7 +521,7 @@ containers:
 
   - service_name: ytdl_material
     active: true
-    image: tzahi12345/youtubedl-material:latest
+    image: tzahi12345/youtubedl-material:nightly-2024-10-01
     environment:
       - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
       - ytdl_use_local_db=false
@@ -553,7 +553,7 @@ containers:
   - service_name: handbrake
     active: true
     privileged: true
-    image: jlesage/handbrake:latest
+    image: jlesage/handbrake:v24.09.1
     labels:
       - traefik.enable=true
       - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
@@ -590,7 +590,7 @@ containers:
 
   - service_name: archivebox
     active: true
-    image: archivebox/archivebox
+    image: archivebox/archivebox:0.8.5rc3
     labels:
       - traefik.enable=true
       - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
@@ -603,7 +603,7 @@ containers:
 
   - service_name: metube
     active: true
-    image: ghcr.io/alexta69/metube
+    image: ghcr.io/alexta69/metube:2024-10-04
     labels:
       - traefik.enable=true
       - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
@@ -627,7 +627,7 @@ containers:
 
   - service_name: joplin
     active: true
-    image: joplin/server:latest
+    image: joplin/server:2.14.2-beta
     labels:
       - traefik.enable=true
       - traefik.http.routers.joplin.rule=Host(`joplin.{{ local_domain }}`)
@@ -660,7 +660,7 @@ containers:
 
   - service_name: syncthing
     active: true
-    image: syncthing/syncthing:latest
+    image: syncthing/syncthing:1.27.12
     labels:
       - traefik.enable=true
       - traefik.http.routers.syncthing.rule=Host(`sync.{{ local_domain }}`)
@@ -678,7 +678,7 @@ containers:
 
   - service_name: calibre-web
     active: true
-    image: lscr.io/linuxserver/calibre-web:latest
+    image: lscr.io/linuxserver/calibre-web:0.6.23
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.calibre-web.rule=Host(`calibre-web.{{ local_domain }}`)"
@@ -694,7 +694,7 @@ containers:
 
   - service_name: calibre
     active: true
-    image: lscr.io/linuxserver/calibre:latest
+    image: lscr.io/linuxserver/calibre:7.19.0
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.calibre.rule=Host(`calibre.{{ local_domain }}`)"
@@ -716,7 +716,7 @@ containers:
 
   - service_name: kuma
     active: true
-    image: louislam/uptime-kuma:alpine
+    image: louislam/uptime-kuma:1.23.15-alpine
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kuma.rule=Host(`status.{{ local_domain }}`)"
@@ -728,7 +728,7 @@ containers:
 
   - service_name: heimdall
     active: true
-    image: lscr.io/linuxserver/heimdall:latest
+    image: lscr.io/linuxserver/heimdall:2.6.1
     volumes:
       - "{{ appdata_path }}/heimdall/config:/config"
     labels:
