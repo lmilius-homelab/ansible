@@ -141,6 +141,20 @@
     - role: lm-traefik
       tags: compose
 
+- hosts: 
+  - nix-server
+  become: true
+  vars_files:
+    - vars/vault.yaml
+  gather_facts: yes
+  roles:
+    - role: lm-traefik
+      tags: compose
+    - role: ironicbadger.docker_compose_generator
+      tags: compose
+    - role: docker_compose_up
+      tags: compose
+
 # - hosts: frigate
 #   become: true
 #   vars_files: vars/vault.yaml

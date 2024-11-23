@@ -24,9 +24,9 @@
               ansible
               bitwarden-cli
             ];
-            # shellHook = ''
-            #   ansbile-galaxy install -r requirements.txt --force
-            # '';
+            shellHook = ''
+              ansible-galaxy install -r requirements.yaml
+            '';
           };
         }
     );

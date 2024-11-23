@@ -3,14 +3,14 @@ http:
     router-homeassistant:
       entryPoints:
         - websecure
-      rule: "Host(`homeassistant.{{ domain_name }}`)"
+      rule: "Host(`homeassistant.{{ local_domain }}`)"
       service: service-homeassistant
       tls:
         certResolver: cloudflare
 #    router-frigate:
 #      entryPoints:
 #        - websecure
-#      rule: "Host(`frigate.{{ domain_name }}`)"
+#      rule: "Host(`frigate.{{ local_domain }}`)"
 #      service: service-frigate
 #      tls:
 #        certResolver: cloudflare
@@ -29,7 +29,7 @@ http:
         scheme: https
 #    authelia:
 #      forwardAuth:
-#        address: "http://authelia:9091/api/verify?rd=https://login.{{ domain_name }}"
+#        address: "http://authelia:9091/api/verify?rd=https://login.{{ local_domain }}"
     default-headers:
       headers:
         frameDeny: true
