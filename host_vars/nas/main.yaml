@@ -24,14 +24,14 @@ traefik_file_provider: true
 traefik_enable_dashboard: true #defaults to false
 traefik_insecure_transport: false #defaults to false
 traefik_exposed_by_default: false
-traefik_config_filepath: "{{ appdata_path }}/traefik-nix"
+traefik_config_filepath: "{{ appdata_path }}/traefik"
 
-zfs_path: /tank
+zfs_path: /tank2
 domain_name: "{{ vault_domain_name }}"
-local_domain: "nix.{{ domain_name }}"
+local_domain: "{{ domain_name }}"
 
 # ironicbadger.docker_compose_generator
-appdata_path: "{{ zfs_path }}/appdata2"
+appdata_path: "{{ zfs_path }}/appdata"
 ntp_timezone: "America/Chicago"
 global_env_vars:
   - "PUID={{ main_uid }}"
@@ -48,8 +48,8 @@ photoprism_important: "{{ zfs_path }}/media_photos/Important"
 photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
-# nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
-# nextcloud_root_db_password: "{{ vault_nextcloud_root_db_password }}"
+nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
+nextcloud_root_db_password: "{{ vault_nextcloud_root_db_password }}"
 # wordpress_shop_db_password: "{{ vault_wordpress_shop_db_password }}"
 # wordpress_shop_root_db_password: "{{ vault_wordpress_shop_root_db_password }}"
 peertube_db_password: "{{ vault_peertube_db_password }}"
@@ -287,7 +287,7 @@ containers:
       - traefik.http.services.nextcloud.loadbalancer.server.port=80
     volumes:
       - "{{ appdata_path }}/nextcloud/data:/var/www/html"
-      # - "{{ storage_path }}:/storage"
+      - "{{ storage_path }}:/storage"
     environment:
       - REDIS_HOST=nextcloud_redis
     include_global_env_vars: true
@@ -505,18 +505,18 @@ containers:
   # #   devices:  
   # #     - /dev/dri
 
-  - service_name: archivebox
-    active: true
-    image: archivebox/archivebox:0.8.5rc3
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
-      - traefik.http.services.archivebox.loadbalancer.server.port=8000
-    volumes:
-      - "{{ appdata_path }}/archivebox/data:/data"
-    include_global_env_vars: true
-    environment:
-      - SAVE_ARCHIVE_DOT_ORG=FALSE
+  # - service_name: archivebox
+  #   active: true
+  #   image: archivebox/archivebox:0.8.5rc3
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
+  #     - traefik.http.services.archivebox.loadbalancer.server.port=8000
+  #   volumes:
+  #     - "{{ appdata_path }}/archivebox/data:/data"
+  #   include_global_env_vars: true
+  #   environment:
+  #     - SAVE_ARCHIVE_DOT_ORG=FALSE
 
   # - service_name: metube
   #   active: true

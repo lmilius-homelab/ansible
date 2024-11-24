@@ -142,7 +142,7 @@
       tags: compose
 
 - hosts: 
-  - nix-server
+  - nixos
   become: true
   vars_files:
     - vars/vault.yaml
