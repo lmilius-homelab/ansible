@@ -4,6 +4,8 @@ frigate_mqtt_host: ""
 frigate_mqtt_user: ""
 frigate_mqtt_password: ""
 
+frigate_host_ip: ""
+
 rtsp_camera_username: ""
 rtsp_camera_password: ""
 

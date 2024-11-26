@@ -1,6 +1,5 @@
 ---
 domain_name: "{{ vault_domain_name }}"
-nas_ip: "{{ vault_nas_ip }}"
 nfs_iso_export: "{{ vault_nfs_iso_export }}"
 nfs_pvedata_export: "{{ vault_nfs_pvedata_export }}"
 init_admin_pass: "{{ vault_init_admin_password }}"
