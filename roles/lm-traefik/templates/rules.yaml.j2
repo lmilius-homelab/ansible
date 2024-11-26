@@ -7,6 +7,13 @@ http:
       service: service-homeassistant
       tls:
         certResolver: cloudflare
+    router-syncthing:
+      entryPoints:
+        - websecure
+      rule: "Host(`sync.{{ local_domain }}`)"
+      service: service-syncthing
+      tls:
+        certResolver: cloudflare
 #    router-frigate:
 #      entryPoints:
 #        - websecure
@@ -19,6 +26,10 @@ http:
       loadBalancer:
         servers:
         - url: "http://{{ vault_hass_host_ip }}:8123"
+    service-syncthing:
+      loadBalancer:
+        servers:
+        - url: "http://127.0.0.1:8384"
 #    service-frigate:
 #      loadBalancer:
 #        servers:

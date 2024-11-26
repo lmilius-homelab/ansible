@@ -621,23 +621,23 @@ containers:
       - "{{ appdata_path }}/joplin/db:/var/lib/postgresql/data"
     restart: "unless-stopped"
 
-  - service_name: syncthing
-    active: true
-    image: syncthing/syncthing:1.27.12
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.syncthing.rule=Host(`sync.{{ local_domain }}`)
-      - traefik.http.services.syncthing.loadbalancer.server.port=8384
-    network: host
-    include_global_env_vars: true
-    expose:
-      - 8384
-    ports:
-      - 22000:22000
-      - 21027:21027/udp
-    volumes:
-      - "{{ appdata_path }}/syncthing:/var/syncthing"
-    restart: "unless-stopped"
+  # - service_name: syncthing
+  #   active: true
+  #   image: syncthing/syncthing:1.27.12
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.syncthing.rule=Host(`sync.{{ local_domain }}`)
+  #     - traefik.http.services.syncthing.loadbalancer.server.port=8384
+  #   network: host
+  #   include_global_env_vars: true
+  #   expose:
+  #     - 8384
+  #   ports:
+  #     - 22001:22000
+  #     - 21028:21027/udp
+  #   volumes:
+  #     - "{{ appdata_path }}/syncthing:/var/syncthing"
+  #   restart: "unless-stopped"
 
   - service_name: calibre-web
     active: true
