@@ -1,3 +1,18 @@
+accessLog:
+  filePath: "/logs/traefik.log"
+  format: json
+  filters:
+    statusCodes:
+      - "200-299" # log successful http requests
+      - "400-599" # log failed http requests
+  # collect logs as in-memory buffer before writing into log file
+  bufferingSize: 0
+  fields:
+    headers:
+      defaultMode: drop # drop all headers per default
+      names:
+          User-Agent: keep # log user agent strings
+
 entryPoints:
   web:
     address: :80
@@ -14,8 +29,20 @@ entryPoints:
         domains:
           - main: {{ local_domain }}
             sans: "*.{{ local_domain }}"
+      middlewares:
+        - secured@file
+
+  metrics:
+    address: :8082
     
 ping: {}
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    entryPoint: metrics
 
 providers:
   docker:
@@ -35,6 +62,10 @@ api:
 
 log:
   level: info
+  maxSize: 20
+  maxBackups: 5
+  maxAge: 14
+  compress: true
 
 certificatesResolvers:
   cloudflare:
@@ -52,3 +83,9 @@ certificatesResolvers:
 serversTransport:
   insecureSkipVerify: true
 {% endif %}
+
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.3.5

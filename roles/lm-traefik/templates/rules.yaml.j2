@@ -29,7 +29,7 @@ http:
     service-syncthing:
       loadBalancer:
         servers:
-        - url: "http://127.0.0.1:8384"
+        - url: "http://{{ vault_nas_host_ip }}:8384"
 #    service-frigate:
 #      loadBalancer:
 #        servers:
@@ -55,15 +55,41 @@ http:
         customRequestHeaders:
           X-Forwarded-Proto: https
 
-    default-whitelist:
-      ipWhiteList:
+    default-allowlist:
+      ipAllowList:
         sourceRange:
-        - "10.0.0.0/24"
+        - "10.0.0.0/8"
         - "192.168.0.0/16"
-        - "172.0.0.0/8"
+        - "172.16.0.0/12"
 
     secured:
       chain:
         middlewares:
-        - default-whitelist
+        - default-allowlist
         - default-headers
+        - crowdsec
+
+    crowdsec:
+      plugin:
+        bouncer:
+          enabled: true
+          defaultDecisionSeconds: 60
+          crowdsecMode: live
+          crowdsecAppsecEnabled: false
+          crowdsecAppsecHost: crowdsec:7422
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecUnreachableBlock: true
+          crowdsecLapiKey: {{ crowdsec_lapi_key }}
+          crowdsecLapiHost: crowdsec:8080
+          crowdsecLapiScheme: http
+          crowdsecLapiTLSInsecureVerify: false
+          forwardedHeadersTrustedIPs:
+            # private class ranges
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+          clientTrustedIPs:
+            # private class ranges
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
