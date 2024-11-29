@@ -63,6 +63,11 @@ photoprism_important: "{{ zfs_path }}/media_photos/Important"
 photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
+# immich
+immich_release_version: "v1.121.0"
+immich_dir: "{{ zfs_path }}/immich"
+immich_db_password: "{{ vault_immich_db_password }}"
+
 # nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
 # nextcloud_root_db_password: "{{ vault_nextcloud_root_db_password }}"
 # # wordpress_shop_db_password: "{{ vault_wordpress_shop_db_password }}"
@@ -101,6 +106,7 @@ containers:
   ###
   - service_name: crowdsec
     active: true
+    restart: unless-stopped
     image: crowdsecurity/crowdsec:v1.6.4
     ports:
       - 127.0.0.1:9876:8080 # port mapping for local firewall bouncers
@@ -315,7 +321,84 @@ containers:
       - "MARIADB_PASSWORD={{ photoprism_db_password }}"
       - "MARIADB_ROOT_PASSWORD={{ photoprism_db_password }}"
     include_global_env_vars: true
+  ###
+  - service_name: immich
+    active: true
+    restart: unless-stopped
+    image: "ghcr.io/immich-app/immich-server:{{ immich_release_version }}"
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - "{{ immich_dir }}/library:/usr/src/app/upload"
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.immich.rule=Host(`immich.{{ local_domain }}`)"
+      - traefik.http.services.immich.loadbalancer.server.port=2283
+    expose:
+      - 2283
+    depends_on:
+      - immich_redis
+      - immich_database
+    environment:
+      - "DB_DATABASE_NAME=immich"
+      - "DB_USERNAME=postgres"
+      - "DB_PASSWORD={{ immich_db_password }}"
+  
+  ###
+  - service_name: immich_ml
+    active: true
+    restart: unless-stopped
+    image: "ghcr.io/immich-app/immich-machine-learning:{{ immich_release_version }}"
+    # device_cgroup_rules:
+    #   - 'c 189:* rmw'
+    # devices:
+    #   - /dev/dri:/dev/dri
+    volumes:
+      - "{{ immich_dir }}/model-cache:/cache"
+      # - /dev/bus/usb:/dev/bus/usb
+    
+  ###
+  - service_name: immich_redis
+    active: true
+    restart: unless-stopped
+    image: "docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8"
+    healthcheck:
+      test: redis-cli ping || exit 1
+    
+  ###
+  - service_name: immich_database
+    active: true
+    restart: unless-stopped
+    image: "docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0"
+    environment:
+      - "POSTGRES_PASSWORD={{ immich_db_password }}"
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=immich
+      - "POSTGRES_INITDB_ARGS='--data-checksums'"
+    volumes:
+      - "{{ immich_dir }}/database:/var/lib/postgresql/data"
+    healthcheck:
+      test: pg_isready --dbname='immich' --username='postgres' || exit 1; Chksum="$$(psql --dbname='immich' --username='postgres' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command:
+      - 'postgres'
+      - '-c'
+      - 'shared_preload_libraries=vectors.so'
+      - '-c'
+      - 'search_path="$$user", public, vectors'
+      - '-c'
+      - 'logging_collector=on'
+      - '-c'
+      - 'max_wal_size=2GB'
+      - '-c'
+      - 'shared_buffers=512MB'
+      - '-c'
+      - 'wal_compression=on'
 
+  ###
   - service_name: duplicati
     active: true
     restart: unless-stopped
