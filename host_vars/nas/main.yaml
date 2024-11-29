@@ -103,6 +103,7 @@ containers:
       - "CLOUDFLARE_EMAIL={{ cloudflare_account_email }}"
       - "CLOUDFLARE_API_KEY={{ cloudflare_api_key }}"
     restart: unless-stopped
+    include_global_env_vars: true
   ###
   - service_name: crowdsec
     active: true
@@ -120,6 +121,7 @@ containers:
       - "/var/log/auth.log:/var/log/auth.log:ro"
       - "/var/log/syslog:/var/log/syslog:ro"
       - "{{ traefik_config_filepath }}/logs:/var/log/traefik:ro"
+    include_global_env_vars: true
     environment:
       - "GID={{ main_gid }}"
       - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios
@@ -340,6 +342,7 @@ containers:
     depends_on:
       - immich_redis
       - immich_database
+    include_global_env_vars: true
     environment:
       - "DB_DATABASE_NAME=immich"
       - "DB_USERNAME=postgres"
@@ -671,6 +674,10 @@ containers:
     include_global_env_vars: true
     environment:
       - SAVE_ARCHIVE_DOT_ORG=FALSE
+      - "CSRF_TRUSTED_ORIGINS=https://archivebox.{{ local_domain }}"
+      - PUBLIC_ADD_VIEW=True
+      - ADMIN_USERNAME=admin
+      - "ADMIN_PASSWORD={{ init_admin_pass }}"
 
   - service_name: metube
     active: true
