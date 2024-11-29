@@ -344,6 +344,8 @@ containers:
       - "DB_DATABASE_NAME=immich"
       - "DB_USERNAME=postgres"
       - "DB_PASSWORD={{ immich_db_password }}"
+      - REDIS_HOSTNAME=immich_redis
+      - DB_HOSTNAME=immich_database
   
   ###
   - service_name: immich_ml
