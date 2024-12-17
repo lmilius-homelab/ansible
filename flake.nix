@@ -26,7 +26,7 @@
             ];
             shellHook = ''
               ansible-galaxy install -r requirements.yaml
-              source setup_ssh_keys.sh
+              # source setup_ssh_keys.sh
             '';
           };
         }

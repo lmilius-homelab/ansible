@@ -130,3 +130,6 @@ dmypy.json
 
 # nix result dir
 result/
+
+# Dir env for Nix flake
+.direnv/
