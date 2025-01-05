@@ -64,7 +64,7 @@ photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
-immich_release_version: "v1.122.3"
+immich_release_version: "v1.123.0"
 immich_dir: "{{ zfs_path }}/immich"
 immich_db_password: "{{ vault_immich_db_password }}"
 
@@ -82,7 +82,7 @@ containers:
   ###
   - service_name: traefik
     active: true
-    image: traefik:v3.2.1
+    image: traefik:v3.2.3
     ports:
       - 80:80
       - 443:443
@@ -194,7 +194,7 @@ containers:
   ###
   - service_name: jellyfin
     active: true
-    image: jellyfin/jellyfin:2024100705
+    image: jellyfin/jellyfin:2024123005
     devices:
       - /dev/dri:/dev/dri
     labels:
@@ -408,7 +408,7 @@ containers:
   - service_name: duplicati
     active: true
     restart: unless-stopped
-    image: lscr.io/linuxserver/duplicati:2.0.8
+    image: lscr.io/linuxserver/duplicati:2.1.0
     labels:
       - traefik.enable=true
       - "traefik.http.routers.duplicati.rule=Host(`backups.{{ local_domain }}`)"
@@ -435,7 +435,7 @@ containers:
   - service_name: nextcloud
     active: true
     restart: unless-stopped
-    image: nextcloud:29.0.7
+    image: nextcloud:30.0.4
     depends_on:
       - nextcloud_mariadb
       - nextcloud_redis
@@ -478,7 +478,7 @@ containers:
   - service_name: paperless
     active: true
     restart: unless-stopped
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.12.1
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.13.5
     depends_on: 
       - paperless_redis
     labels:
@@ -504,7 +504,7 @@ containers:
 
   - service_name: mealie
     active: true
-    image: hkotel/mealie:v1.12.0
+    image: hkotel/mealie:v2.4.1
     labels:
       - traefik.enable=true
       - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
@@ -596,7 +596,7 @@ containers:
 
   - service_name: ytdl_material
     active: true
-    image: tzahi12345/youtubedl-material:nightly-2024-10-01
+    image: tzahi12345/youtubedl-material:nightly-2024-12-31
     environment:
       - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
       - ytdl_use_local_db=false
@@ -628,7 +628,7 @@ containers:
   - service_name: handbrake
     active: true
     privileged: true
-    image: jlesage/handbrake:v24.09.1
+    image: jlesage/handbrake:v24.12.1
     labels:
       - traefik.enable=true
       - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
@@ -665,7 +665,7 @@ containers:
 
   - service_name: archivebox
     active: true
-    image: archivebox/archivebox:0.8.5rc3
+    image: archivebox/archivebox:0.8.5rc51
     labels:
       - traefik.enable=true
       - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
@@ -682,7 +682,7 @@ containers:
 
   - service_name: metube
     active: true
-    image: ghcr.io/alexta69/metube:2024-10-04
+    image: ghcr.io/alexta69/metube
     labels:
       - traefik.enable=true
       - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
@@ -706,7 +706,7 @@ containers:
 
   - service_name: joplin
     active: true
-    image: joplin/server:2.14.2-beta
+    image: joplin/server:3.0.1-beta
     labels:
       - traefik.enable=true
       - traefik.http.routers.joplin.rule=Host(`joplin.{{ local_domain }}`)
