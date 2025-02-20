@@ -64,7 +64,7 @@ photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
-immich_release_version: "v1.123.0"
+immich_release_version: "v1.126.1"
 immich_dir: "{{ zfs_path }}/immich"
 immich_db_password: "{{ vault_immich_db_password }}"
 
@@ -129,7 +129,7 @@ containers:
   - service_name: frigate
     active: true
     privileged: true
-    image: ghcr.io/blakeblackshear/frigate:stable
+    image: ghcr.io/blakeblackshear/frigate:0.15.0
     shm_size: 256m
     labels:
       - "traefik.enable=true"
