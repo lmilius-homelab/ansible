@@ -25,8 +25,22 @@ traefik_enable_dashboard: true #defaults to false
 traefik_insecure_transport: false #defaults to false
 traefik_exposed_by_default: false
 traefik_config_filepath: "{{ appdata_path }}/traefik-nix"
+crowdsec_lapi_key: "{{ vault_crowdsec_lapi_key }}"
+
+# # frigate
+# frigate_filepath: "{{ nvr_path }}/frigate"
+# frigate_config_filepath: "{{ frigate_filepath }}/config"
+# frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
+# frigate_host_ip: "{{ vault_nas_host_ip }}"
+# frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
+# frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
+# frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
+# rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
+# rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
+# camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
 
 zfs_path: /tank
+nvr_path: "{{ zfs_path }}/nvr"
 domain_name: "{{ vault_domain_name }}"
 local_domain: "nix.{{ domain_name }}"
 
@@ -81,14 +95,14 @@ containers:
       - "CLOUDFLARE_API_KEY={{ cloudflare_api_key }}"
     restart: unless-stopped
   ###
-  - service_name: influxdb
-    active: true
-    image: influxdb:1.8
-    volumes:
-      - "{{ appdata_path }}/influxdb:/config"
-    ports:
-      - 8086:8086
-    restart: unless-stopped
+  # - service_name: influxdb
+  #   active: true
+  #   image: influxdb:1.8
+  #   volumes:
+  #     - "{{ appdata_path }}/influxdb:/config"
+  #   ports:
+  #     - 8086:8086
+  #   restart: unless-stopped
   ###
   - service_name: librespeed
     active: true
@@ -101,7 +115,39 @@ containers:
       - TELEMETRY=true
     include_global_env_vars: true
     restart: unless-stopped
-  ###
+  # ###
+  # - service_name: frigate
+  #   active: true
+  #   privileged: true
+  #   image: ghcr.io/blakeblackshear/frigate:0.15.0
+  #   shm_size: 256m
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.frigate.entrypoints=websecure"
+  #     - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
+  #     - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+  #   devices:
+  #     - /dev/dri/renderD128
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - "{{ frigate_config_filepath }}:/config"
+  #     - "{{ frigate_filepath }}/media:/media/frigate"
+  #     - type: tmpfs # Option: 2GB of memory, reduces SSD wear
+  #       target: /tmp/cache
+  #       tmpfs:
+  #         size: 2000000000
+  #   ports:
+  #     - "1935:1935"
+  #     - "1984:1984" # go2rtc http api
+  #     - "5000:5000"
+  #     - "8554:8554" # RTSP feeds
+  #     - "8555:8555/tcp" # WebRTC over tcp
+  #     - "8555:8555/udp" # WebRTC over udp
+  #   environment:
+  #     - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+  #   include_global_env_vars: true
+  #   restart: unless-stopped
+  # ###
   # - service_name: filebrowser
   #   active: true
   #   image: filebrowser/filebrowser:v2.31.2-s6
@@ -274,90 +320,90 @@ containers:
   #     - "/var/run/docker.sock:/var/run/docker.sock"
   #   include_global_env_vars: true
 
-  - service_name: nextcloud
-    active: true
-    restart: unless-stopped
-    image: nextcloud:29.0.7
-    depends_on:
-      - nextcloud_mariadb
-      - nextcloud_redis
-    labels:
-      - traefik.enable=true
-      - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.{{ local_domain }}`)"
-      - traefik.http.services.nextcloud.loadbalancer.server.port=80
-    volumes:
-      - "{{ appdata_path }}/nextcloud/data:/var/www/html"
-      # - "{{ storage_path }}:/storage"
-    environment:
-      - REDIS_HOST=nextcloud_redis
-    include_global_env_vars: true
+  # - service_name: nextcloud
+  #   active: true
+  #   restart: unless-stopped
+  #   image: nextcloud:29.0.7
+  #   depends_on:
+  #     - nextcloud_mariadb
+  #     - nextcloud_redis
+  #   labels:
+  #     - traefik.enable=true
+  #     - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.{{ local_domain }}`)"
+  #     - traefik.http.services.nextcloud.loadbalancer.server.port=80
+  #   volumes:
+  #     - "{{ appdata_path }}/nextcloud/data:/var/www/html"
+  #     # - "{{ storage_path }}:/storage"
+  #   environment:
+  #     - REDIS_HOST=nextcloud_redis
+  #   include_global_env_vars: true
 
-  - service_name: nextcloud_redis
-    active: true
-    restart: unless-stopped
-    image: redis:alpine
+  # - service_name: nextcloud_redis
+  #   active: true
+  #   restart: unless-stopped
+  #   image: redis:alpine
 
-  - service_name: nextcloud_mariadb
-    active: true
-    restart: unless-stopped
-    image: mariadb:10.5
-    volumes:
-      - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"
-    environment:
-      - MYSQL_AUTO_UPGRADE=1
-      # - MYSQL_DISABLE_UPGRADE_BACKUP=1
-      - "MYSQL_DATABASE=nextcloud"
-      - "MYSQL_USER=nextcloud"
-      - "MYSQL_PASSWORD={{ nextcloud_db_password }}"
-      - "MYSQL_ROOT_PASSWORD={{ nextcloud_root_db_password }}"
-    include_global_env_vars: true
+  # - service_name: nextcloud_mariadb
+  #   active: true
+  #   restart: unless-stopped
+  #   image: mariadb:10.5
+  #   volumes:
+  #     - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"
+  #   environment:
+  #     - MYSQL_AUTO_UPGRADE=1
+  #     # - MYSQL_DISABLE_UPGRADE_BACKUP=1
+  #     - "MYSQL_DATABASE=nextcloud"
+  #     - "MYSQL_USER=nextcloud"
+  #     - "MYSQL_PASSWORD={{ nextcloud_db_password }}"
+  #     - "MYSQL_ROOT_PASSWORD={{ nextcloud_root_db_password }}"
+  #   include_global_env_vars: true
 
-  - service_name: paperless_redis
-    active: true
-    restart: unless-stopped
-    image: docker.io/library/redis:7
+  # - service_name: paperless_redis
+  #   active: true
+  #   restart: unless-stopped
+  #   image: docker.io/library/redis:7
 
-  - service_name: paperless
-    active: true
-    restart: unless-stopped
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.12.1
-    depends_on: 
-      - paperless_redis
-    labels:
-      - traefik.enable=true
-      - "traefik.http.routers.paperless.rule=Host(`paperless.{{ local_domain }}`)"
-      - traefik.http.services.paperless.loadbalancer.server.port=8000
-    # healthcheck:
-    #   test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 5
-    volumes:
-      - "{{ appdata_path }}/paperless/data:/usr/src/paperless/data"
-      - "{{ appdata_path }}/paperless/media:/usr/src/paperless/media"
-      - "{{ appdata_path }}/paperless/export:/usr/src/paperless/export"
-      - "{{ appdata_path }}/paperless/consume:/usr/src/paperless/consume"
-    environment:
-      - "PAPERLESS_REDIS=redis://paperless_redis:6379"
-      - "PAPERLESS_URL=https://paperless.{{ local_domain }}"
-      - "PAPERLESS_TIME_ZONE={{ ntp_timezone }}"
-      - "USERMAP_UID={{ main_uid }}"
-      - "USERMAP_GID={{ main_gid }}"
+  # - service_name: paperless
+  #   active: true
+  #   restart: unless-stopped
+  #   image: ghcr.io/paperless-ngx/paperless-ngx:2.12.1
+  #   depends_on: 
+  #     - paperless_redis
+  #   labels:
+  #     - traefik.enable=true
+  #     - "traefik.http.routers.paperless.rule=Host(`paperless.{{ local_domain }}`)"
+  #     - traefik.http.services.paperless.loadbalancer.server.port=8000
+  #   # healthcheck:
+  #   #   test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+  #   #   interval: 30s
+  #   #   timeout: 10s
+  #   #   retries: 5
+  #   volumes:
+  #     - "{{ appdata_path }}/paperless/data:/usr/src/paperless/data"
+  #     - "{{ appdata_path }}/paperless/media:/usr/src/paperless/media"
+  #     - "{{ appdata_path }}/paperless/export:/usr/src/paperless/export"
+  #     - "{{ appdata_path }}/paperless/consume:/usr/src/paperless/consume"
+  #   environment:
+  #     - "PAPERLESS_REDIS=redis://paperless_redis:6379"
+  #     - "PAPERLESS_URL=https://paperless.{{ local_domain }}"
+  #     - "PAPERLESS_TIME_ZONE={{ ntp_timezone }}"
+  #     - "USERMAP_UID={{ main_uid }}"
+  #     - "USERMAP_GID={{ main_gid }}"
 
-  - service_name: mealie
-    active: true
-    image: hkotel/mealie:v1.12.0
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
-    environment:
-      - DB_TYPE=sqlite
-      - ALLOW_SIGNUP=false
-      - "BASE_URL=https://mealie.{{ local_domain }}"
-    volumes:
-      - "{{ appdata_path }}/mealie/data:/app/data"
-    restart: unless-stopped
-    include_global_env_vars: true
+  # - service_name: mealie
+  #   active: true
+  #   image: hkotel/mealie:v1.12.0
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
+  #   environment:
+  #     - DB_TYPE=sqlite
+  #     - ALLOW_SIGNUP=false
+  #     - "BASE_URL=https://mealie.{{ local_domain }}"
+  #   volumes:
+  #     - "{{ appdata_path }}/mealie/data:/app/data"
+  #   restart: unless-stopped
+  #   include_global_env_vars: true
 
   # # - service_name: wordpress-shop
   # #   active: true
@@ -505,18 +551,18 @@ containers:
   # #   devices:  
   # #     - /dev/dri
 
-  - service_name: archivebox
-    active: true
-    image: archivebox/archivebox:0.8.5rc3
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
-      - traefik.http.services.archivebox.loadbalancer.server.port=8000
-    volumes:
-      - "{{ appdata_path }}/archivebox/data:/data"
-    include_global_env_vars: true
-    environment:
-      - SAVE_ARCHIVE_DOT_ORG=FALSE
+  # - service_name: archivebox
+  #   active: true
+  #   image: archivebox/archivebox:0.8.5rc3
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
+  #     - traefik.http.services.archivebox.loadbalancer.server.port=8000
+  #   volumes:
+  #     - "{{ appdata_path }}/archivebox/data:/data"
+  #   include_global_env_vars: true
+  #   environment:
+  #     - SAVE_ARCHIVE_DOT_ORG=FALSE
 
   # - service_name: metube
   #   active: true

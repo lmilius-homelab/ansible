@@ -5,7 +5,7 @@ mqtt:
 
 database:
   path: /config/frigate.db
-  
+
 ffmpeg:
   hwaccel_args: preset-vaapi
   output_args:
@@ -24,12 +24,17 @@ go2rtc:
       - "{{ frigate_host_ip }}:8555"
       - stun:8555
   streams:
+    # doorbell:
+    #   - rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif#backchannel=0
+    #   - ffmpeg:doorbell#audio=aac
+    # doorbell_sub:
+    #   - rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif#backchannel=0
+    #   - ffmpeg:doorbell_sub#audio=aac
     doorbell:
-      - rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif#backchannel=0
-      - ffmpeg:doorbell#audio=aac
+      - ffmpeg:rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.20:554/Preview_01_main#audio=aac#video=h264
+      - ffmpeg:doorbell#audio=aac#video=h264#hardware
     doorbell_sub:
-      - rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.15:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif#backchannel=0
-      - ffmpeg:doorbell_sub#audio=aac
+      - ffmpeg:rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.20:554/Preview_01_sub
     cam3:
       - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.16/stream1
       - ffmpeg:cam3#audio=aac
@@ -42,24 +47,30 @@ go2rtc:
     #cam4_sub:
     #  - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.17/stream2
     #  - ffmpeg:cam4_sub#audio=aac
-    cam5:
-      - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream1
-      - ffmpeg:cam5#audio=aac
-    cam5_sub:
-      - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream2
-      - ffmpeg:cam5_sub#audio=aac
-    batcam:
-      - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.12:554/cam/realmonitor?channel=1&subtype=0
-      - ffmpeg:batcam#audio=aac
-    batcam_sub:
-      - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.12:554/cam/realmonitor?channel=1&subtype=1
-      - ffmpeg:batcam_sub#audio=aac
+    # cam5:
+    #   - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream1
+    #   - ffmpeg:cam5#audio=aac
+    # cam5_sub:
+    #   - rtsp://camera:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.18/stream2
+    #   - ffmpeg:cam5_sub#audio=aac
+    # batcam:
+    #   - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.12:554/cam/realmonitor?channel=1&subtype=0
+    #   - ffmpeg:batcam#audio=aac
+    # batcam_sub:
+    #   - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.12:554/cam/realmonitor?channel=1&subtype=1
+    #   - ffmpeg:batcam_sub#audio=aac
     nursery:
       - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.19:554/Preview_01_main
       - ffmpeg:nursery#audio=aac
     nursery_sub:
       - rtsp://cam:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.19:554/Preview_01_sub
       - ffmpeg:nursery_sub#audio=aac
+    front:
+      - ffmpeg:rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.21:554/Preview_01_main#audio=aac#video=h264
+      - ffmpeg:front#audio=aac#video=h264#hardware
+    front_sub:
+      - ffmpeg:rtsp://admin:{{ rtsp_camera_password }}@{{ camera_subnet_prefix }}.21:554/Preview_01_sub
+      # - ffmpeg:front#audio=aac#video=h264#hardware
 
 cameras:
   doorbell:
@@ -152,6 +163,40 @@ cameras:
         labels:
           - fire_alarm
 
+  front:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/front
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+            - audio
+        - path: rtsp://127.0.0.1:8554/front_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+      # hwaccel_args: -hwaccel qsv -hwaccel_output_format nv12 -c:v h264_qsv
+      # input_args: -avoid_negative_ts make_zero -fflags +genpts+discardcorrupt -flags low_delay -strict experimental -analyzeduration 1000M -probesize 1000M -rw_timeout 5000000
+      # output_args:
+      #   record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
+    # onvif:
+    #   host: "{{ camera_subnet_prefix }}.37"
+    #   port: 8000
+    #   user: admin
+    #   password: ""
+    detect:
+      fps: 7
+    objects:
+      track:
+        - person
+    ui:
+      order: 1
+    review:
+      alerts:
+        labels: []
+      detections:
+        labels: []
+
   #   motion:
   #     mask: 0.002,0,0.001,0.046,0.357,0.048,0.357,0.002
   cam3:
@@ -218,71 +263,71 @@ cameras:
   #  motion:
   #    mask: 0.002,0,0.001,0.046,0.357,0.048,0.357,0.002
 
-  cam5:
-    ffmpeg:
-      inputs:
-        - path: rtsp://127.0.0.1:8554/cam5
-          input_args: preset-rtsp-restream
-          roles:
-            - record
-        - path: rtsp://127.0.0.1:8554/cam5_sub
-          input_args: preset-rtsp-restream
-          roles:
-            - detect
-            - audio
-    detect:
-      fps: 5
-    objects:
-      track:
-        - person
-        - cat
-        - dog
-        - car
-    ui:
-      order: 10
+  # cam5:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: rtsp://127.0.0.1:8554/cam5
+  #         input_args: preset-rtsp-restream
+  #         roles:
+  #           - record
+  #       - path: rtsp://127.0.0.1:8554/cam5_sub
+  #         input_args: preset-rtsp-restream
+  #         roles:
+  #           - detect
+  #           - audio
+  #   detect:
+  #     fps: 5
+  #   objects:
+  #     track:
+  #       - person
+  #       - cat
+  #       - dog
+  #       - car
+  #   ui:
+  #     order: 10
 
-    motion:
-      mask:
-        - 0.001,0,0.001,0.044,0.354,0.053,0.355,0
-        - 0.358,0.239,0.058,0.242,0.057,0.048,0.357,0.055
-    review:
-      alerts:
-        labels: []
-      detections:
-        labels:
-          - person
+  #   motion:
+  #     mask:
+  #       - 0.001,0,0.001,0.044,0.354,0.053,0.355,0
+  #       - 0.358,0.239,0.058,0.242,0.057,0.048,0.357,0.055
+  #   review:
+  #     alerts:
+  #       labels: []
+  #     detections:
+  #       labels:
+  #         - person
 
-    zones:
-      garage_luke:
-        coordinates: 0.324,0.553,0.552,0.592,0.418,1,0.182,1,0.066,0.8
-        loitering_time: 0
-        inertia: 3
-      garage_emma:
-        coordinates: 0.574,0.589,0.758,0.607,0.765,0.995,0.447,0.996
-        loitering_time: 0
+  #   zones:
+  #     garage_luke:
+  #       coordinates: 0.324,0.553,0.552,0.592,0.418,1,0.182,1,0.066,0.8
+  #       loitering_time: 0
+  #       inertia: 3
+  #     garage_emma:
+  #       coordinates: 0.574,0.589,0.758,0.607,0.765,0.995,0.447,0.996
+  #       loitering_time: 0
 
-  batcam:
-    ffmpeg:
-      inputs:
-        - path: rtsp://127.0.0.1:8554/batcam
-          input_args: preset-rtsp-restream
-          roles:
-            - record
-        - path: rtsp://127.0.0.1:8554/batcam_sub
-          input_args: preset-rtsp-restream
-          roles:
-            - detect
-            - audio
-    detect:
-      fps: 5
-    objects:
-      track:
-        - bird
-        - mouse
-        - cat
+  # batcam:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: rtsp://127.0.0.1:8554/batcam
+  #         input_args: preset-rtsp-restream
+  #         roles:
+  #           - record
+  #       - path: rtsp://127.0.0.1:8554/batcam_sub
+  #         input_args: preset-rtsp-restream
+  #         roles:
+  #           - detect
+  #           - audio
+  #   detect:
+  #     fps: 5
+  #   objects:
+  #     track:
+  #       - bird
+  #       - mouse
+  #       - cat
 
-    ui:
-      order: 5
+  #   ui:
+  #     order: 5
 
 objects:
   track:
@@ -292,7 +337,7 @@ objects:
     - cat
 
 birdseye:
-  enabled: True
+  enabled: true
   width: 1920
   height: 1080
   quality: 4
@@ -305,18 +350,19 @@ snapshots:
   bounding_box: true
   quality: 100
   retain:
-    default: 60
+    default: 30
 
 record:
   enabled: true
   retain:
-    days: 14
+    days: 7
     mode: all
-  events:
+  alerts:
     retain:
-      default: 30
-      mode: active_objects
-
+      days: 14
+  detections:
+    retain:
+      days: 10
 telemetry:
   stats:
     intel_gpu_stats: true
@@ -344,10 +390,10 @@ model:
   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
 timestamp_style:
-  position: "bl"
+  position: bl
   effect: shadow
 
-version: 0.14
+version: 0.15-1
 
 camera_groups:
   Birdseye:

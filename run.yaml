@@ -141,17 +141,17 @@
     - role: lm-traefik
       tags: compose
 
-- hosts:
-    - nas
-  become: true
-  vars_files:
-    - vars/vault.yaml
-  gather_facts: yes
-  roles:
-    - role: lm-frigate-config
-      tags: 
-        - compose
-        - frigate_config
+# - hosts:
+#     - nas
+#   become: true
+#   vars_files:
+#     - vars/vault.yaml
+#   gather_facts: yes
+#   roles:
+#     - role: lm-frigate-config
+#       tags: 
+#         - compose
+#         - frigate_config
 
 - hosts: 
     - nixos
