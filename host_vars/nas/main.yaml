@@ -27,17 +27,17 @@ traefik_exposed_by_default: false
 traefik_config_filepath: "{{ appdata_path }}/traefik"
 crowdsec_lapi_key: "{{ vault_crowdsec_lapi_key }}"
 
-# frigate
-frigate_filepath: "{{ nvr_path }}/frigate"
-frigate_config_filepath: "{{ frigate_filepath }}/config"
-frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
-frigate_host_ip: "{{ vault_nas_host_ip }}"
-frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
-frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
-frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
-rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
-rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
-camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
+# # frigate
+# frigate_filepath: "{{ nvr_path }}/frigate"
+# frigate_config_filepath: "{{ frigate_filepath }}/config"
+# frigate_rtsp_password: "{{ vault_frigate_rtsp_password }}"
+# frigate_host_ip: "{{ vault_nas_host_ip }}"
+# frigate_mqtt_host: "{{ vault_frigate_mqtt_host }}"
+# frigate_mqtt_user: "{{ vault_frigate_mqtt_user }}"
+# frigate_mqtt_password: "{{ vault_frigate_mqtt_password }}"
+# rtsp_camera_username: "{{ vault_rtsp_camera_username }}"
+# rtsp_camera_password: "{{ vault_rtsp_camera_password }}"
+# camera_subnet_prefix: "{{ vault_camera_subnet_prefix }}"
 
 zfs_path: /tank2
 nvr_path: "{{ zfs_path }}/nvr"
@@ -126,37 +126,37 @@ containers:
       - "GID={{ main_gid }}"
       - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios
   ###
-  - service_name: frigate
-    active: true
-    privileged: true
-    image: ghcr.io/blakeblackshear/frigate:0.15.0
-    shm_size: 256m
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frigate.entrypoints=websecure"
-      - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
-      - "traefik.http.services.frigate.loadbalancer.server.port=5000"
-    devices:
-      - /dev/dri/renderD128
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - "{{ frigate_config_filepath }}:/config"
-      - "{{ frigate_filepath }}/media:/media/frigate"
-      - type: tmpfs # Option: 2GB of memory, reduces SSD wear
-        target: /tmp/cache
-        tmpfs:
-          size: 2000000000
-    ports:
-      - "1935:1935"
-      - "1984:1984" # go2rtc http api
-      - "5000:5000"
-      - "8554:8554" # RTSP feeds
-      - "8555:8555/tcp" # WebRTC over tcp
-      - "8555:8555/udp" # WebRTC over udp
-    environment:
-      - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
-    include_global_env_vars: true
-    restart: unless-stopped
+  # - service_name: frigate
+  #   active: true
+  #   privileged: true
+  #   image: ghcr.io/blakeblackshear/frigate:0.15.0
+  #   shm_size: 256m
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.frigate.entrypoints=websecure"
+  #     - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
+  #     - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+  #   devices:
+  #     - /dev/dri/renderD128
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - "{{ frigate_config_filepath }}:/config"
+  #     - "{{ frigate_filepath }}/media:/media/frigate"
+  #     - type: tmpfs # Option: 2GB of memory, reduces SSD wear
+  #       target: /tmp/cache
+  #       tmpfs:
+  #         size: 2000000000
+  #   ports:
+  #     - "1935:1935"
+  #     - "1984:1984" # go2rtc http api
+  #     - "5000:5000"
+  #     - "8554:8554" # RTSP feeds
+  #     - "8555:8555/tcp" # WebRTC over tcp
+  #     - "8555:8555/udp" # WebRTC over udp
+  #   environment:
+  #     - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+  #   include_global_env_vars: true
+  #   restart: unless-stopped
   ###
   - service_name: influxdb
     active: true
