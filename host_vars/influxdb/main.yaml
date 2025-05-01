@@ -118,3 +118,16 @@ containers:
       - "{{ appdata_path }}/influxdb2/config:/etc/influxdb2"
     ports:
       - 8086:8086
+    
+  ###
+  # - service_name: foshkplugin
+  #   active: true
+  #   image: ghcr.io/ruimarinho/foshkplugin
+  #   ports:
+  #     - 8780:8780/udp
+  #     - 8781:8781
+  #   volumes:
+  #     - "{{ appdata_path }}/foshkplugin/foshkplugin.conf:/opt/foshkplugin/foshkplugin.conf:ro"
+  #     - "{{ appdata_path }}/foshkplugin/logs:/opt/foshkplugin/logs"
+  #   environment:
+  #     - "LBPCONFIG=/opt/"
