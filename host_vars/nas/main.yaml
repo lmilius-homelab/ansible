@@ -64,7 +64,7 @@ photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
-immich_release_version: "v1.126.1"
+immich_release_version: "v1.132.3"
 immich_dir: "{{ zfs_path }}/immich"
 immich_db_password: "{{ vault_immich_db_password }}"
 
@@ -105,26 +105,26 @@ containers:
     restart: unless-stopped
     include_global_env_vars: true
   ###
-  - service_name: crowdsec
-    active: true
-    restart: unless-stopped
-    image: crowdsecurity/crowdsec:v1.6.4
-    ports:
-      - 127.0.0.1:9876:8080 # port mapping for local firewall bouncers
-    expose:
-      - 8080 # http api for bouncers
-      - 6060 # metrics endpoint for prometheus
-      - 7422 # appsec waf endpoint
-    volumes:
-      - "{{ appdata_path }}/crowdsec/data:/var/lib/crowdsec/data"
-      - "{{ appdata_path }}/crowdsec/etc:/etc/crowdsec"
-      - "/var/log/auth.log:/var/log/auth.log:ro"
-      - "/var/log/syslog:/var/log/syslog:ro"
-      - "{{ traefik_config_filepath }}/logs:/var/log/traefik:ro"
-    include_global_env_vars: true
-    environment:
-      - "GID={{ main_gid }}"
-      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios
+  # - service_name: crowdsec
+  #   active: true
+  #   restart: unless-stopped
+  #   image: crowdsecurity/crowdsec:v1.6.4
+  #   ports:
+  #     - 127.0.0.1:9876:8080 # port mapping for local firewall bouncers
+  #   expose:
+  #     - 8080 # http api for bouncers
+  #     - 6060 # metrics endpoint for prometheus
+  #     - 7422 # appsec waf endpoint
+  #   volumes:
+  #     - "{{ appdata_path }}/crowdsec/data:/var/lib/crowdsec/data"
+  #     - "{{ appdata_path }}/crowdsec/etc:/etc/crowdsec"
+  #     - "/var/log/auth.log:/var/log/auth.log:ro"
+  #     - "/var/log/syslog:/var/log/syslog:ro"
+  #     - "{{ traefik_config_filepath }}/logs:/var/log/traefik:ro"
+  #   include_global_env_vars: true
+  #   environment:
+  #     - "GID={{ main_gid }}"
+  #     - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios
   ###
   # - service_name: frigate
   #   active: true
@@ -368,7 +368,7 @@ containers:
   - service_name: immich_redis
     active: true
     restart: unless-stopped
-    image: "docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8"
+    image: "docker.io/valkey/valkey:8-bookworm@sha256:c855f98e09d558a0d7cc1a4e56473231206a4c54c0114ada9c485b47aeb92ec8"
     healthcheck:
       test: redis-cli ping || exit 1
     
@@ -376,7 +376,7 @@ containers:
   - service_name: immich_database
     active: true
     restart: unless-stopped
-    image: "docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0"
+    image: "docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52"
     environment:
       - "POSTGRES_PASSWORD={{ immich_db_password }}"
       - POSTGRES_USER=postgres
