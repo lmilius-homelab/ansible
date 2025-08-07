@@ -1,3 +1,3 @@
 #!/bin/sh
 
-bw get password vault_pass
+bw get password homelab_ansible_vault_pass
