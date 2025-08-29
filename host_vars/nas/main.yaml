@@ -815,5 +815,40 @@ containers:
       - "traefik.http.routers.heimdall.rule=Host(`home.{{ local_domain }}`)"
     include_global_env_vars: true
     restart: unless-stopped
+
+  - service_name: linkwarden_db
+    active: true
+    image: postgres:16-alpine
+    volumes:
+      - "{{ appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data"
+    restart: unless-stopped
+    include_global_env_vars: true
+    environment:
+      - "POSTGRES_PASSWORD={{ vault_linkwarden_db_pass }}"
+
+  - service_name: linkwarden
+    active: true
+    image: ghcr.io/linkwarden/linkwarden:v2.12.2
+    volumes:
+      - "{{ appdata_path }}/linkwarden/data:/data/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkwarden.rule=Host(`links.{{ local_domain }}`)"
+    environment:
+      - "DATABASE_URL=postgresql://postgres:{{ vault_linkwarden_db_pass }}@linkwarden_db:5432/postgres"
+      - "NEXTAUTH_SECRET={{ vault_linkwarden_secret_key }}"
+      - "MEILI_HOST=linkwarden_search"
+    include_global_env_vars: true
+    restart: unless-stopped
+
+  - service_name: linkwarden_search
+    active: true
+    image: getmeili/meilisearch:v1.12.8
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/linkwarden/meili_data:/meili_data"
+    include_global_env_vars: true
+    environment:
+      - "MEILI_MASTER_KEY={{ vault_linkwarden_meili_key }}"
     
     
