@@ -850,5 +850,36 @@ containers:
     include_global_env_vars: true
     environment:
       - "MEILI_MASTER_KEY={{ vault_linkwarden_meili_key }}"
+
+  - service_name: lube_logger
+    active: true
+    image: ghcr.io/hargata/lubelogger:v1.5.0
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/lubelogger/data:/App/data"
+      - "{{ appdata_path }}/lubelogger/keys:/root/.aspnet/DataProtection-Keys"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lubelogger.rule=Host(`lubelog.{{ local_domain }}`)"
+    include_global_env_vars: true
+    environment:
+      - "LC_ALL=en_US"
+      - "LANG=en_US"
+      - "LUBELOGGER_CUSTOM_WIDGETS=true"
+      - "LUBELOGGER_INVARIANT_API=true"
+
+  - service_name: silver_bullet
+    active: true
+    image: ghcr.io/silverbulletmd/silverbullet:2.0.0
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/silverbullet/space:/space"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.silverbullet.rule=Host(`silverbullet.{{ local_domain }}`)"
+    include_global_env_vars: true
+    environment:
+      - "SB_USER=lmilius:{{ init_admin_pass }}"
+
     
     
