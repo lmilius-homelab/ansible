@@ -116,4 +116,20 @@ containers:
     include_global_env_vars: true
     restart: unless-stopped
   ###
+  - service_name: beszel_agent
+    active: true
+    image: henrygd/beszel-agent:0.12.7
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ zfs_path }}:/extra-filesystems{{ zfs_path }}:ro"
+    include_global_env_vars: true
+    environment:
+      - "LISTEN=/beszel_socket/beszel.sock"
+      - "HUB_URL=https://beszel.{{ domain_name }}"
+      - "KEY={{ vault_beszel_agent_nvr_pubkey }}"
+      - "TOKEN={{ vault_beszel_agent_nvr_token }}"
  
