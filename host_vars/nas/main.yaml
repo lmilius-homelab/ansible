@@ -883,7 +883,7 @@ containers:
 
   - service_name: beszel
     active: true
-    image: henrygd/beszel:v0.12.7
+    image: henrygd/beszel:0.12.7
     restart: unless-stopped
     volumes:
       - "{{ appdata_path }}/beszel/data:/beszel_data"
@@ -895,7 +895,7 @@ containers:
 
   - service_name: beszel_agent
     active: false
-    image: henrygd/beszel-agent:v0.12.7
+    image: henrygd/beszel-agent:0.12.7
     restart: unless-stopped
     network_mode: host
     volumes:
