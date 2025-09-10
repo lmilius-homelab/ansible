@@ -881,5 +881,33 @@ containers:
     environment:
       - "SB_USER=lmilius:{{ init_admin_pass }}"
 
+  - service_name: beszel
+    active: true
+    image: henrygd/beszel:v0.12.7
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/beszel/data:/beszel_data"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.{{ local_domain }}`)"
+    include_global_env_vars: true
+
+  - service_name: beszel_agent
+    active: false
+    image: henrygd/beszel-agent:v0.12.7
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    include_global_env_vars: true
+    environment:
+      - "LISTEN=/beszel_socket/beszel.sock"
+      - "HUB_URL=https://beszel.{{ local_domain }}"
+      - "TOKEN="
+      - "KEY="
+
     
     
