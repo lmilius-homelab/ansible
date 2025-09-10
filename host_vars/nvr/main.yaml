@@ -125,7 +125,6 @@ containers:
       - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
       - "{{ appdata_path }}/beszel/socket:/beszel_socket"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ zfs_path }}:/extra-filesystems{{ zfs_path }}:ro"
     include_global_env_vars: true
     environment:
       - "LISTEN=/beszel_socket/beszel.sock"
