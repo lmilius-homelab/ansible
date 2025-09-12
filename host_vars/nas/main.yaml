@@ -905,6 +905,8 @@ containers:
       - 3000
     include_global_env_vars: true
     environment:
+      - "UID={{ main_uid }}"
+      - "GID={{ main_gid }}"
       - "FQDN=borg.{{ local_domain }}"
       - "NEXTAUTH_URL=https://borg.{{ local_domain }}"
       - "NEXTAUTH_SECRET={{ vault_borgwarehouse_auth_secret }}"
