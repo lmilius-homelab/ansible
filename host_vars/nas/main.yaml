@@ -891,5 +891,42 @@ containers:
       - "KEY={{ vault_beszel_agent_nas_pubkey }}"
       - "TOKEN={{ vault_beszel_agent_nas_token }}"
 
+  - service_name: borgwarehouse
+    active: true
+    image: borgwarehouse/borgwarehouse:v3.1.1
+    user: "{{ main_uid }}:{{ main_gid }}"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.borgwarehouse.rule=Host(`borg.{{ local_domain }}`)"
+      - traefik.http.services.borgwarehouse.loadbalancer.server.port=3000
+    ports:
+      - "2222:22"
+      - 3000
+    include_global_env_vars: true
+    environment:
+      - "FQDN=borg.{{ local_domain }}"
+      - "NEXTAUTH_URL=https://borg.{{ local_domain }}"
+      - "NEXTAUTH_SECRET={{ vault_borgwarehouse_auth_secret }}"
+      - "CRONJOB_KEY={{ vault_borgwarehouse_cron_key }}"
+    volumes:
+      - "{{ appdata_path }}/borgwarehouse/config:/home/borgwarehouse/app/config"
+      - "{{ appdata_path }}/borgwarehouse/ssh:/home/borgwarehouse/.ssh"
+      - "{{ appdata_path }}/borgwarehouse/ssh_host:/etc/ssh"
+      - "{{ appdata_path }}/borgwarehouse/repos:/home/borgwarehouse/repos"
+      - "{{ appdata_path }}/borgwarehouse/tmp:/home/borgwarehouse/tmp"
+      - "{{ appdata_path }}/borgwarehouse/logs:/home/borgwarehouse/logs"
+
+  - service_name: apprise
+    active: true
+    image: caronc/apprise:1.2.1
+    user: "www-data:www-data"
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/apprise/config:/config"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apprise.rule=Host(`apprise.{{ local_domain }}`)"
+
     
     
