@@ -349,8 +349,6 @@ containers:
       - "DB_PASSWORD={{ immich_db_password }}"
       - REDIS_HOSTNAME=immich_redis
       - DB_HOSTNAME=immich_database
-    healthcheck:
-      disable: false
   
   ###
   - service_name: immich_ml
@@ -365,8 +363,6 @@ containers:
     volumes:
       - "{{ immich_dir }}/model-cache:/cache"
       # - /dev/bus/usb:/dev/bus/usb
-    healthcheck:
-      disable: false
     
   ###
   - service_name: immich_redis
