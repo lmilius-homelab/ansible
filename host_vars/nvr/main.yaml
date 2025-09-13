@@ -85,7 +85,7 @@ containers:
   - service_name: frigate
     active: true
     privileged: true
-    image: ghcr.io/blakeblackshear/frigate:0.15.1
+    image: ghcr.io/blakeblackshear/frigate:0.16.1
     shm_size: 256m
     labels:
       - "traefik.enable=true"
