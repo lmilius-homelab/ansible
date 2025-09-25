@@ -1,8 +1,8 @@
 services:
   paperless:
-    active: true
     restart: unless-stopped
     image: ghcr.io/paperless-ngx/paperless-ngx:2.13.5
+    container_name: paperless
     depends_on: 
       - paperless_redis
     labels:
@@ -27,6 +27,6 @@ services:
       - "USERMAP_GID={{ docker_compose_generator_gid }}"
 
   paperless_redis:
-    active: true
     restart: unless-stopped
     image: docker.io/library/redis:7
+    container_name: paperless_redis

@@ -1,6 +1,7 @@
 services:
   jellyfin:
     image: jellyfin/jellyfin:2024123005
+    container_name: jellyfin
     devices:
       - /dev/dri:/dev/dri
     labels:

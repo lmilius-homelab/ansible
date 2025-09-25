@@ -2,6 +2,7 @@ services:
   immich:
     restart: unless-stopped
     image: "ghcr.io/immich-app/immich-server:{{ immich_release_version }}"
+    container_name: immich
     devices:
       - /dev/dri:/dev/dri
     volumes:
@@ -31,6 +32,7 @@ services:
     restart: unless-stopped
     hostname: immich-machine-learning
     image: "ghcr.io/immich-app/immich-machine-learning:{{ immich_release_version }}"
+    container_name: immich_ml
     # device_cgroup_rules:
     #   - 'c 189:* rmw'
     # devices:
@@ -43,6 +45,7 @@ services:
   immich_redis:
     restart: unless-stopped
     image: "docker.io/valkey/valkey:8-bookworm@sha256:c855f98e09d558a0d7cc1a4e56473231206a4c54c0114ada9c485b47aeb92ec8"
+    container_name: immich_redis
     healthcheck:
       test: redis-cli ping || exit 1
     
@@ -50,6 +53,7 @@ services:
   immich_database:
     restart: unless-stopped
     image: "ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0"
+    container_name: immich_database
     environment:
       - "POSTGRES_PASSWORD={{ immich_db_password }}"
       - POSTGRES_USER=postgres

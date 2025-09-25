@@ -1,6 +1,7 @@
 services:
   traefik:
     image: traefik:v2.10.7
+    container_name: traefik
     ports:
       - 80:80
       - 443:443
@@ -24,6 +25,7 @@ services:
 
   librespeed:
     image: linuxserver/librespeed:5.4.1
+    container_name: librespeed
     labels:
       - traefik.enable=true
       - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"

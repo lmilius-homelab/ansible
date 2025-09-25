@@ -1,6 +1,7 @@
 services:
   influxdb:
     image: influxdb:2.7
+    container_name: influxdb
     environment:
       - MODE=standalone
       - TELEMETRY=false

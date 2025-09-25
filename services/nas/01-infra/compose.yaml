@@ -1,6 +1,7 @@
 services:
   traefik:
     image: traefik:v3.2.3
+    container_name: traefik
     ports:
       - 80:80
       - 443:443
@@ -27,6 +28,7 @@ services:
 
   influxdb:
     image: influxdb:1.8
+    container_name: influxdb
     volumes:
       - "{{ appdata_path }}/influxdb:/config"
     ports:
@@ -35,6 +37,7 @@ services:
 
   librespeed:
     image: linuxserver/librespeed:5.4.1
+    container_name: librespeed
     labels:
       - traefik.enable=true
       - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"
@@ -49,6 +52,7 @@ services:
   portainer:
     restart: unless-stopped
     image: portainer/portainer-ce:2.22.0
+    container_name: portainer
     labels:
       - traefik.enable=true
       - "traefik.http.routers.portainer.rule=Host(`portainer.{{ local_domain }}`)"

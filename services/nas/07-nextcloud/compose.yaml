@@ -2,6 +2,7 @@ services:
   nextcloud:
     restart: unless-stopped
     image: nextcloud:30.0.4
+    container_name: nextcloud
     depends_on:
       - nextcloud_mariadb
       - nextcloud_redis
@@ -21,10 +22,12 @@ services:
   nextcloud_redis:
     restart: unless-stopped
     image: redis:alpine
+    container_name: nextcloud_redis
 
   nextcloud_mariadb:
     restart: unless-stopped
     image: mariadb:10.5
+    container_name: nextcloud_mariadb
     volumes:
       - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"
     environment:

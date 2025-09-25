@@ -2,6 +2,7 @@ services:
   duplicati:
     restart: unless-stopped
     image: lscr.io/linuxserver/duplicati:2.1.0
+    container_name: duplicati
     labels:
       - traefik.enable=true
       - "traefik.http.routers.duplicati.rule=Host(`backups.{{ local_domain }}`)"

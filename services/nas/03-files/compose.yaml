@@ -1,6 +1,7 @@
 services:
   filebrowser:
     image: filebrowser/filebrowser:v2.31.2-s6
+    container_name: filebrowser
     labels:
       - traefik.enable=true
       - "traefik.http.routers.fb.rule=Host(`files.{{ local_domain }}`)"
