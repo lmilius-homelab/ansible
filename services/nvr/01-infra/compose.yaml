@@ -1,0 +1,48 @@
+services:
+  traefik:
+    image: traefik:v3.3.5
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`proxy.{{ local_domain }}`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+    volumes:
+      - "{{ traefik_config_filepath }}:/etc/traefik"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - "CLOUDFLARE_EMAIL={{ cloudflare_account_email }}"
+      - "CLOUDFLARE_API_KEY={{ cloudflare_api_key }}"
+    restart: unless-stopped
+  librespeed:
+    image: linuxserver/librespeed:5.4.1
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.librespeed.rule=Host(`speed.{{ local_domain }}`)"
+    environment:
+      - MODE=standalone
+      - TELEMETRY=true
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+  beszel_agent:
+    image: henrygd/beszel-agent:0.12.7
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - "LISTEN=/beszel_socket/beszel.sock"
+      - "HUB_URL=https://beszel.{{ domain_name }}"
+      - "KEY={{ vault_beszel_agent_nvr_pubkey }}"
+      - "TOKEN={{ vault_beszel_agent_nvr_token }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"

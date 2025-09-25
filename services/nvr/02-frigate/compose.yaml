@@ -1,0 +1,35 @@
+services:
+  frigate:
+    privileged: true
+    image: ghcr.io/blakeblackshear/frigate:0.16.1
+    shm_size: 256m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frigate.entrypoints=websecure"
+      - "traefik.http.routers.frigate.rule=Host(`frigate.{{ local_domain }}`)"
+      - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+    devices:
+      - /dev/dri/renderD128
+      - /dev/apex_0:/dev/apex_0
+      - /dev/apex_1:/dev/apex_1
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - "{{ frigate_config_filepath }}:/config"
+      - "{{ frigate_filepath }}/media:/media/frigate"
+      - type: tmpfs # Option: 2GB of memory, reduces SSD wear
+        target: /tmp/cache
+        tmpfs:
+          size: 2000000000
+    ports:
+      - "1935:1935"
+      - "1984:1984" # go2rtc http api
+      - "5000:5000"
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    environment:
+      - "FRIGATE_RTSP_PASSWORD={{ frigate_rtsp_password }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped

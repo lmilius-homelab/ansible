@@ -1,0 +1,15 @@
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:v2.31.2-s6
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.fb.rule=Host(`files.{{ local_domain }}`)"
+    volumes:
+      - "{{ storage_path }}:/srv"
+      - "{{ appdata_path }}/filebrowser/database:/database"
+      - "{{ appdata_path }}/filebrowser/config:/config"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped

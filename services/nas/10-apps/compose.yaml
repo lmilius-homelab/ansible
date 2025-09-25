@@ -1,0 +1,340 @@
+services:
+  mealie:
+    image: hkotel/mealie:v2.4.1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.{{ local_domain }}`)
+    environment:
+      - DB_TYPE=sqlite
+      - ALLOW_SIGNUP=false
+      - "BASE_URL=https://mealie.{{ local_domain }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/mealie/data:/app/data"
+    restart: unless-stopped
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:nightly-2024-12-31
+    environment:
+      - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
+      - ytdl_use_local_db=false
+      - write_ytdl_config=true
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: "unless-stopped"
+    volumes:
+      - "{{ appdata_path }}/ytdl/appdata:/app/appdata"
+      - "{{ appdata_path }}/ytdl/audio:/app/audio"
+      - "{{ media_path }}videos/videos:/app/video"
+      - "{{ media_path }}videos/subscriptions:/app/subscriptions"
+      - "{{ appdata_path }}/ytdl/users:/app/users"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ytdl.rule=Host(`tube-dl.{{ local_domain }}`)
+      - traefik.http.services.ytdl.loadbalancer.server.port=17442
+    depends_on:
+      - ytdl_mongodb
+
+  ytdl_mongodb:
+    image: mongo:4
+    logging:
+      driver: "none"
+    restart: "unless-stopped"
+    volumes:
+      - "{{ appdata_path }}/ytdl/db:/data/db"
+
+  handbrake:
+    privileged: true
+    image: jlesage/handbrake:v24.12.1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
+      - traefik.http.services.handbrake.loadbalancer.server.port=5800
+    volumes:
+      - "{{ appdata_path }}/handbrake/config:/config"
+      - "{{ media_path }}movies:/storage/movies"
+      - "{{ media_path }}videos:/storage/videos"
+      - "{{ media_path }}tvshows:/storage/tvshows"
+    devices:  
+      - /dev/dri:/dev/dri
+    restart: "unless-stopped"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  archivebox:
+    image: archivebox/archivebox:0.8.5rc51
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
+      - traefik.http.services.archivebox.loadbalancer.server.port=8000
+    volumes:
+      - "{{ appdata_path }}/archivebox/data:/data"
+    environment:
+      - SAVE_ARCHIVE_DOT_ORG=FALSE
+      - "CSRF_TRUSTED_ORIGINS=https://archivebox.{{ local_domain }}"
+      - PUBLIC_ADD_VIEW=True
+      - ADMIN_USERNAME=admin
+      - "ADMIN_PASSWORD={{ init_admin_pass }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  metube:
+    image: ghcr.io/alexta69/metube
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
+      - traefik.http.services.metube.loadbalancer.server.port=8081
+    volumes:
+      - "{{ media_path }}videos/metube:/downloads"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  joplin:
+    image: joplin/server:3.0.1-beta
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.joplin.rule=Host(`joplin.{{ local_domain }}`)
+      - traefik.http.services.joplin.loadbalancer.server.port=22300
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=https://joplin.{{ local_domain }}
+      - DB_CLIENT=pg
+      - POSTGRES_PASSWORD={{ joplin_postgres_password }}
+      - POSTGRES_DATABASE=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=joplin_db
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: "unless-stopped"
+    depends_on:
+      - joplin_db
+
+  joplin_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD={{ joplin_postgres_password }}
+      - POSTGRES_USER=joplin
+      - POSTGRES_DB=joplin
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/joplin/db:/var/lib/postgresql/data"
+    restart: "unless-stopped"
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:0.6.23
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-web.rule=Host(`calibre-web.{{ local_domain }}`)"
+      - traefik.http.services.calibre-web.loadbalancer.server.port=8083
+    environment:
+      - DOCKER_MODS=ghcr.io/linuxserver/mods:universal-calibre
+      # - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/calibre/data:/config"
+      - "{{ appdata_path }}/calibre/db:/books"
+    restart: "unless-stopped"
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:7.19.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre.rule=Host(`calibre.{{ local_domain }}`)"
+      - "traefik.http.routers.calibre.service=calibre"
+      - "traefik.http.services.calibre.loadbalancer.server.port=8080"
+      - "traefik.http.routers.calibrewebserver.rule=Host(`books.{{ local_domain }}`)"
+      - "traefik.http.routers.calibrewebserver.service=calibrewebserver"
+      - "traefik.http.services.calibrewebserver.loadbalancer.server.port=8081"
+    environment:
+      - "PASSWORD={{ init_admin_pass }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    expose:
+      - 8080
+      - 8081
+    volumes:
+      - "{{ media_path }}books:/books"
+      - "{{ appdata_path }}/calibre/db:/config"
+    restart: "unless-stopped"
+
+  kuma:
+    image: louislam/uptime-kuma:1.23.15-alpine
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kuma.rule=Host(`status.{{ local_domain }}`)"
+    volumes:
+      - "{{ appdata_path }}/kuma/data:/app/data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: "unless-stopped"
+
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:2.6.1
+    volumes:
+      - "{{ appdata_path }}/heimdall/config:/config"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.heimdall.rule=Host(`home.{{ local_domain }}`)"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+
+  linkwarden_db:
+    image: postgres:16-alpine
+    volumes:
+      - "{{ appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data"
+    restart: unless-stopped
+    environment:
+      - "POSTGRES_PASSWORD={{ vault_linkwarden_db_pass }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:v2.12.2
+    volumes:
+      - "{{ appdata_path }}/linkwarden/data:/data/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkwarden.rule=Host(`links.{{ local_domain }}`)"
+    environment:
+      - "DATABASE_URL=postgresql://postgres:{{ vault_linkwarden_db_pass }}@linkwarden_db:5432/postgres"
+      - "NEXTAUTH_SECRET={{ vault_linkwarden_secret_key }}"
+      - "MEILI_HOST=linkwarden_search"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+
+  linkwarden_search:
+    image: getmeili/meilisearch:v1.12.8
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/linkwarden/meili_data:/meili_data"
+    environment:
+      - "MEILI_MASTER_KEY={{ vault_linkwarden_meili_key }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  lube_logger:
+    image: ghcr.io/hargata/lubelogger:v1.5.0
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/lubelogger/data:/App/data"
+      - "{{ appdata_path }}/lubelogger/keys:/root/.aspnet/DataProtection-Keys"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lubelogger.rule=Host(`lubelog.{{ local_domain }}`)"
+    environment:
+      - "LC_ALL=en_US"
+      - "LANG=en_US"
+      - "LUBELOGGER_CUSTOM_WIDGETS=true"
+      - "LUBELOGGER_INVARIANT_API=true"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  silver_bullet:
+    image: ghcr.io/silverbulletmd/silverbullet:2.0.0
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/silverbullet/space:/space"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.silverbullet.rule=Host(`silverbullet.{{ local_domain }}`)"
+    environment:
+      - "SB_USER=lmilius:{{ init_admin_pass }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  beszel:
+    image: henrygd/beszel:0.12.7
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/beszel/data:/beszel_data"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.{{ local_domain }}`)"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  beszel_agent:
+    image: henrygd/beszel-agent:0.12.7
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
+      - "{{ appdata_path }}/beszel/socket:/beszel_socket"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - "LISTEN=/beszel_socket/beszel.sock"
+      - "HUB_URL=https://beszel.{{ local_domain }}"
+      - "KEY={{ vault_beszel_agent_nas_pubkey }}"
+      - "TOKEN={{ vault_beszel_agent_nas_token }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+
+  borgwarehouse:
+    image: borgwarehouse/borgwarehouse:v3.1.1
+    user: "{{ docker_compose_generator_uid }}:{{ docker_compose_generator_gid }}"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.borgwarehouse.rule=Host(`borg.{{ local_domain }}`)"
+      - traefik.http.services.borgwarehouse.loadbalancer.server.port=3000
+    ports:
+      - "2222:22"
+      - 3000
+    environment:
+      - "UID={{ docker_compose_generator_uid }}"
+      - "GID={{ docker_compose_generator_gid }}"
+      - "FQDN=borg.{{ local_domain }}"
+      - "NEXTAUTH_URL=https://borg.{{ local_domain }}"
+      - "NEXTAUTH_SECRET={{ vault_borgwarehouse_auth_secret }}"
+      - "CRONJOB_KEY={{ vault_borgwarehouse_cron_key }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/borgwarehouse/config:/home/borgwarehouse/app/config"
+      - "{{ appdata_path }}/borgwarehouse/ssh:/home/borgwarehouse/.ssh"
+      - "{{ appdata_path }}/borgwarehouse/ssh_host:/etc/ssh"
+      - "{{ appdata_path }}/borgwarehouse/repos:/home/borgwarehouse/repos"
+      - "{{ appdata_path }}/borgwarehouse/tmp:/home/borgwarehouse/tmp"
+      - "{{ appdata_path }}/borgwarehouse/logs:/home/borgwarehouse/logs"
+
+  apprise:
+    image: caronc/apprise:1.2.1
+    user: "www-data:www-data"
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/apprise/config:/config"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apprise.rule=Host(`apprise.{{ local_domain }}`)"

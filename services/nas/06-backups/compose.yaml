@@ -1,0 +1,13 @@
+services:
+  duplicati:
+    restart: unless-stopped
+    image: lscr.io/linuxserver/duplicati:2.1.0
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.duplicati.rule=Host(`backups.{{ local_domain }}`)"
+      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+    volumes:
+      - "{{ photoprism_dir }}/originals:/source/photoprism/originals"
+      - "{{ zfs_path }}:/source/tank2"
+      - "{{ appdata_path }}/duplicati/config:/config"
+      - "{{ backup_drive }}/duplicati:/local_backup"

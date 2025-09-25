@@ -96,28 +96,28 @@ pve_lxc_net_interfaces:
 
 appdata_path: "/appdata"
 
-containers: 
-  - service_name: influxdb
-    active: true
-    image: influxdb:2.7
-    environment:
-      - MODE=standalone
-      - TELEMETRY=false
-      - DOCKER_INFLUXDB_INIT_MODE=upgrade
-      - DOCKER_INFLUXDB_INIT_USERNAME=homeassistant
-      - DOCKER_INFLUXDB_INIT_PASSWORD={{ vault_influxdb_homeassistant_password }}
-      - DOCKER_INFLUXDB_INIT_ORG=homelab
-      - DOCKER_INFLUXDB_INIT_BUCKET=homeassistant
-    include_global_env_vars: true
-    restart: unless-stopped
-    volumes:
-      - "{{ appdata_path }}/influxdb/data:/var/lib/influxdb"
-      - "{{ appdata_path }}/influxdb/config:/etc/influxdb"
-      - "{{ appdata_path }}/influxdb/homeassistant:/backups"
-      - "{{ appdata_path }}/influxdb2/data:/var/lib/influxdb2"
-      - "{{ appdata_path }}/influxdb2/config:/etc/influxdb2"
-    ports:
-      - 8086:8086
+# containers: 
+#   - service_name: influxdb
+#     active: true
+#     image: influxdb:2.7
+#     environment:
+#       - MODE=standalone
+#       - TELEMETRY=false
+#       - DOCKER_INFLUXDB_INIT_MODE=upgrade
+#       - DOCKER_INFLUXDB_INIT_USERNAME=homeassistant
+#       - DOCKER_INFLUXDB_INIT_PASSWORD={{ vault_influxdb_homeassistant_password }}
+#       - DOCKER_INFLUXDB_INIT_ORG=homelab
+#       - DOCKER_INFLUXDB_INIT_BUCKET=homeassistant
+#     include_global_env_vars: true
+#     restart: unless-stopped
+#     volumes:
+#       - "{{ appdata_path }}/influxdb/data:/var/lib/influxdb"
+#       - "{{ appdata_path }}/influxdb/config:/etc/influxdb"
+#       - "{{ appdata_path }}/influxdb/homeassistant:/backups"
+#       - "{{ appdata_path }}/influxdb2/data:/var/lib/influxdb2"
+#       - "{{ appdata_path }}/influxdb2/config:/etc/influxdb2"
+#     ports:
+#       - 8086:8086
     
   ###
   # - service_name: foshkplugin

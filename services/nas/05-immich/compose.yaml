@@ -1,0 +1,63 @@
+services:
+  immich:
+    restart: unless-stopped
+    image: "ghcr.io/immich-app/immich-server:{{ immich_release_version }}"
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - "{{ immich_dir }}/library:/usr/src/app/upload"
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.immich.rule=Host(`immich.{{ local_domain }}`)"
+      - traefik.http.services.immich.loadbalancer.server.port=2283
+    expose:
+      - 2283
+    depends_on:
+      - immich_redis
+      - immich_database
+    environment:
+      - "DB_DATABASE_NAME=immich"
+      - "DB_USERNAME=postgres"
+      - "DB_PASSWORD={{ immich_db_password }}"
+      - REDIS_HOSTNAME=immich_redis
+      - DB_HOSTNAME=immich_database
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+  
+  ###
+  immich_ml:
+    restart: unless-stopped
+    hostname: immich-machine-learning
+    image: "ghcr.io/immich-app/immich-machine-learning:{{ immich_release_version }}"
+    # device_cgroup_rules:
+    #   - 'c 189:* rmw'
+    # devices:
+    #   - /dev/dri:/dev/dri
+    volumes:
+      - "{{ immich_dir }}/model-cache:/cache"
+      # - /dev/bus/usb:/dev/bus/usb
+    
+  ###
+  immich_redis:
+    restart: unless-stopped
+    image: "docker.io/valkey/valkey:8-bookworm@sha256:c855f98e09d558a0d7cc1a4e56473231206a4c54c0114ada9c485b47aeb92ec8"
+    healthcheck:
+      test: redis-cli ping || exit 1
+    
+  ###
+  immich_database:
+    restart: unless-stopped
+    image: "ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0"
+    environment:
+      - "POSTGRES_PASSWORD={{ immich_db_password }}"
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=immich
+      - "POSTGRES_INITDB_ARGS='--data-checksums'"
+      - "DB_STORAGE_TYPE=HDD"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ immich_dir }}/database:/var/lib/postgresql/data"
