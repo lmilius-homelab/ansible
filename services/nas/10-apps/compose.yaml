@@ -71,7 +71,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   archivebox:
-    image: archivebox/archivebox:0.8.5rc51
+    image: archivebox/archivebox:0.8.5rc9
     container_name: archivebox
     labels:
       - traefik.enable=true
