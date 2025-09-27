@@ -57,6 +57,7 @@ docker_compose_generator_gid: "{{ main_gid }}"
 docker_compose_generator_output_path: /home/deployer/services
 
 media_path: "{{ zfs_path }}/media_"
+media_dataset_path: "{{ zfs_path }}/media"
 storage_path: "{{ zfs_path }}/archives"
 photoprism_dir: "{{ zfs_path }}/photoprism"
 photoprism_important: "{{ zfs_path }}/media_photos/Important"
