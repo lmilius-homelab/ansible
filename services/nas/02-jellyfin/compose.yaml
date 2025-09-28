@@ -5,7 +5,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     labels:
-      - traefik.enable=true
+      - traefik.enable=true 
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ local_domain }}`)"
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
     volumes:
@@ -22,15 +22,176 @@ services:
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
 
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/ombi/config:/config"
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.ombi.rule=Host(`ombi.{{ local_domain }}`)"
+    restart: unless-stopped
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:release-4.5.3
+    container_name: sabnzbd
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sabnzbd.rule=Host(`downloader.{{ local_domain }}`)"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - VPN_ENABLED=true #
+      - VPN_CONF=wg0 #
+      - VPN_PROVIDER=proton #
+      - "VPN_LAN_NETWORK={{ vault_lan_subnet }}" #
+      - VPN_LAN_LEAK_ENABLED=false #
+      - VPN_EXPOSE_PORTS_ON_LAN=8080/tcp #
+      - VPN_AUTO_PORT_FORWARD=false #
+      - VPN_AUTO_PORT_FORWARD_TO_PORTS= #
+      - VPN_FIREWALL_TYPE=auto #
+      - VPN_HEALTHCHECK_ENABLED=true #
+      - VPN_NAMESERVERS= #
+      - PRIVOXY_ENABLED=false #
+      - UNBOUND_ENABLED=false #
+      - UNBOUND_NAMESERVERS #
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
+    volumes:
+      - /mnt/appdata/sabnzbd/config:/config
+      - /mnt/media/usenet:/data/usenet
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:release-2.0.5.5160
+    container_name: prowlarr
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.{{ local_domain }}`)"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - VPN_ENABLED=true #
+      - VPN_CONF=wg0 #
+      - VPN_PROVIDER=proton #
+      - "VPN_LAN_NETWORK={{ vault_lan_subnet }}" #
+      - VPN_LAN_LEAK_ENABLED=false #
+      - VPN_EXPOSE_PORTS_ON_LAN=9696/tcp #
+      - VPN_AUTO_PORT_FORWARD=false #
+      - VPN_AUTO_PORT_FORWARD_TO_PORTS= #
+      - VPN_FIREWALL_TYPE=auto #
+      - VPN_HEALTHCHECK_ENABLED=true #
+      - VPN_NAMESERVERS= #
+      - PRIVOXY_ENABLED=false #
+      - UNBOUND_ENABLED=false #
+      - UNBOUND_NAMESERVERS #
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
+    volumes:
+      - /mnt/appdata/prowlarr/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr:release-4.0.15.2941
+    container_name: sonarr
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sonarr.rule=Host(`sonarr.{{ local_domain }}`)"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - VPN_ENABLED=true #
+      - VPN_CONF=wg0 #
+      - VPN_PROVIDER=proton #
+      - "VPN_LAN_NETWORK={{ vault_lan_subnet }}" #
+      - VPN_LAN_LEAK_ENABLED=false #
+      - VPN_EXPOSE_PORTS_ON_LAN=8989/tcp #
+      - VPN_AUTO_PORT_FORWARD=false #
+      - VPN_AUTO_PORT_FORWARD_TO_PORTS= #
+      - VPN_FIREWALL_TYPE=auto #
+      - VPN_HEALTHCHECK_ENABLED=true #
+      - VPN_NAMESERVERS= #
+      - PRIVOXY_ENABLED=false #
+      - UNBOUND_ENABLED=false #
+      - UNBOUND_NAMESERVERS #
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
+    volumes:
+      - /mnt/appdata/sonarr/config:/config
+      - /mnt/media:/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  radarr:
+    image: ghcr.io/hotio/radarr:release-5.27.5.10198
+    container_name: radarr
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.radarr.rule=Host(`radarr.{{ local_domain }}`)"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - VPN_ENABLED=true #
+      - VPN_CONF=wg0 #
+      - VPN_PROVIDER=proton #
+      - "VPN_LAN_NETWORK={{ vault_lan_subnet }}" #
+      - VPN_LAN_LEAK_ENABLED=false #
+      - VPN_EXPOSE_PORTS_ON_LAN=7878/tcp #
+      - VPN_AUTO_PORT_FORWARD=false #
+      - VPN_AUTO_PORT_FORWARD_TO_PORTS= #
+      - VPN_FIREWALL_TYPE=auto #
+      - VPN_HEALTHCHECK_ENABLED=true #
+      - VPN_NAMESERVERS= #
+      - PRIVOXY_ENABLED=false #
+      - UNBOUND_ENABLED=false #
+      - UNBOUND_NAMESERVERS #
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
+    volumes:
+      - /mnt/appdata/radarr/config:/config
+      - /mnt/media:/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
   jellyseerr:
-    image: fallenbagel/jellyseerr:2.7.3
+    image: ghcr.io/hotio/jellyseerr:release-2.7.3
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
-      - "TZ={{ ntp_timezone }}"
       - PORT=5055
       - "PUID={{ docker_compose_generator_uid }}"
       - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
     volumes:
       - "{{ appdata_path }}jellyseer/config:/app/config"
     labels:
@@ -44,18 +205,3 @@ services:
       interval: 15s
       retries: 3
     restart: unless-stopped
-
-  configarr:
-    image: ghcr.io/raydak-labs/configarr:latest
-    container_name: configarr
-    #user: 1000:1000 # Optional, defaults to root:root
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    volumes:
-      - "{{ appdata_path }}/configarr/config:/app/config" # Contains the config.yml and secrets.yml
-      - "{{ appdata_path }}/configarr/dockerrepos:/app/repos" # Cache repositories
-      # - ./custom/cfs:/app/cfs # Optional if custom formats locally provided
-      # - ./custom/templates:/app/templates # Optional if custom templates
-    restart: "no" # optional make sure this is set to no or removed. Default is no

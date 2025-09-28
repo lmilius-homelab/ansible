@@ -319,20 +319,6 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
 
-  ombi:
-    image: lscr.io/linuxserver/ombi:latest
-    container_name: ombi
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    volumes:
-      - "{{ appdata_path }}/ombi/config:/config"
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.ombi.rule=Host(`ombi.{{ local_domain }}`)"
-    restart: unless-stopped
-
   # borgwarehouse:
   #   image: borgwarehouse/borgwarehouse:v3.1.1
   #   container_name: borgwarehouse
