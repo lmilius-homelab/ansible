@@ -1,6 +1,6 @@
 services:
   filebrowser:
-    image: filebrowser/filebrowser:v2.31.2-s6
+    image: filebrowser/filebrowser:v2.44.0-s6
     container_name: filebrowser
     labels:
       - traefik.enable=true
