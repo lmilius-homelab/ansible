@@ -1,6 +1,6 @@
 services:
   mealie:
-    image: hkotel/mealie:v2.4.1
+    image: hkotel/mealie:v2.8.0
     container_name: mealie
     labels:
       - traefik.enable=true
