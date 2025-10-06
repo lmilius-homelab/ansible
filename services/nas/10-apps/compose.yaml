@@ -104,7 +104,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   joplin:
-    image: joplin/server:3.0.1-beta
+    image: joplin/server:3.3.9-beta
     container_name: joplin
     labels:
       - traefik.enable=true
