@@ -26,7 +26,7 @@ services:
 
   nextcloud_mariadb:
     restart: unless-stopped
-    image: mariadb:10.5
+    image: mariadb:10.11
     container_name: nextcloud_mariadb
     volumes:
       - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"

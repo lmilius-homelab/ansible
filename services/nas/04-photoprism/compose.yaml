@@ -85,7 +85,7 @@ services:
     ## If MariaDB gets stuck in a restart loop, this points to a memory or filesystem issue:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
     restart: unless-stopped
-    image: mariadb:10.8
+    image: mariadb:10.11
     container_name: photoprism_mariadb
     security_opt:
       - seccomp:unconfined
