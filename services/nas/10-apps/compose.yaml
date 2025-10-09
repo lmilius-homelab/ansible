@@ -272,7 +272,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   silver_bullet:
-    image: ghcr.io/silverbulletmd/silverbullet:2.0.0
+    image: ghcr.io/silverbulletmd/silverbullet:2.1.9
     container_name: silver_bullet
     restart: unless-stopped
     volumes:
