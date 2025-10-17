@@ -224,7 +224,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   linkwarden:
-    image: ghcr.io/linkwarden/linkwarden:v2.13.0
+    image: ghcr.io/linkwarden/linkwarden:v2.13.1
     container_name: linkwarden
     volumes:
       - "{{ appdata_path }}/linkwarden/data:/data/data"
