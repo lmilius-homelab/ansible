@@ -331,6 +331,8 @@ services:
       - "TZ={{ ntp_timezone }}"
     volumes:
       - "{{ appdata_path }}/orcaslicer/config:/config"
+    devices:
+      - /dev/dri:/dev/dri
     expose:
       - 3000
     shm_size: "1gb" #optional
