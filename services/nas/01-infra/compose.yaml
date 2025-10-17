@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
 
   influxdb:
-    image: influxdb:1.8
+    image: influxdb:1.12
     container_name: influxdb
     volumes:
       - "{{ appdata_path }}/influxdb:/config"
