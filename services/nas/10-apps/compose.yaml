@@ -159,7 +159,7 @@ services:
     restart: "unless-stopped"
 
   calibre:
-    image: lscr.io/linuxserver/calibre:7.19.0
+    image: lscr.io/linuxserver/calibre:7.26.0
     container_name: calibre
     labels:
       - "traefik.enable=true"
