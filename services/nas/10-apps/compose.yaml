@@ -287,7 +287,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   beszel:
-    image: henrygd/beszel:0.13.2
+    image: henrygd/beszel:0.15.4
     container_name: beszel
     restart: unless-stopped
     volumes:
