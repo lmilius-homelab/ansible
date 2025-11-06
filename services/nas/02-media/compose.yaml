@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   sabnzbd:
-    image: ghcr.io/hotio/sabnzbd:release-4.5.3
+    image: ghcr.io/hotio/sabnzbd:release-4.5.5
     container_name: sabnzbd
     labels:
       - "traefik.enable=true"
@@ -76,7 +76,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: ghcr.io/hotio/prowlarr:release-2.0.5.5160
+    image: ghcr.io/hotio/prowlarr:release-2.1.5.5216
     container_name: prowlarr
     labels:
       - "traefik.enable=true"
@@ -96,7 +96,7 @@ services:
       - sabnzbd
 
   sonarr:
-    image: ghcr.io/hotio/sonarr:release-4.0.15.2941
+    image: ghcr.io/hotio/sonarr:release-4.0.16.2944
     container_name: sonarr
     labels:
       - "traefik.enable=true"
@@ -117,7 +117,7 @@ services:
       - sabnzbd
 
   radarr:
-    image: ghcr.io/hotio/radarr:release-5.27.5.10198
+    image: ghcr.io/hotio/radarr:release-5.28.0.10274
     container_name: radarr
     labels:
       - "traefik.enable=true"
