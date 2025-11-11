@@ -26,14 +26,14 @@ services:
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
 
-  influxdb:
-    image: influxdb:1.12
-    container_name: influxdb
-    volumes:
-      - "{{ appdata_path }}/influxdb:/config"
-    ports:
-      - 8086:8086
-    restart: unless-stopped
+  # influxdb:
+  #   image: influxdb:1.12
+  #   container_name: influxdb
+  #   volumes:
+  #     - "{{ appdata_path }}/influxdb:/config"
+  #   ports:
+  #     - 8086:8086
+  #   restart: unless-stopped
 
   librespeed:
     image: linuxserver/librespeed:5.4.1

@@ -155,25 +155,37 @@ services:
       - "{{ appdata_path }}/pinchflat/config:/config"
       - "{{ media_dataset_path }}/videos:/downloads"
 
-  # jellyseerr:
-  #   image: ghcr.io/hotio/jellyseerr:release-2.7.3
-  #   container_name: jellyseerr
-  #   environment:
-  #     - LOG_LEVEL=debug
-  #     - PORT=5055
-  #     - "PUID={{ docker_compose_generator_uid }}"
-  #     - "PGID={{ docker_compose_generator_gid }}"
-  #     - "TZ={{ ntp_timezone }}"
-  #   volumes:
-  #     - "{{ appdata_path }}/jellyseer/config:/app/config"
-  #   labels:
-  #     - traefik.enable=true
-  #     - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`)"
-  #     - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
-  #   healthcheck:
-  #     test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
-  #     start_period: 20s
-  #     timeout: 3s
-  #     interval: 15s
-  #     retries: 3
-  #   restart: unless-stopped
+  jellyseerr:
+    image: ghcr.io/hotio/jellyseerr:release-2.7.3
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - PORT=5055
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/jellyseer/config:/config"
+    expose:
+      - 5055
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`)"
+      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+    restart: unless-stopped
+
+  profilarr:
+    image: santiagosayshey/profilarr:v1.1.3
+    container_name: profilarr
+    ports:
+      - 6868:6868
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.profilarr.rule=Host(`profilarr.{{ local_domain }}`)"
+    volumes:
+      - "{{ appdata_path }}/profilarr/config:/config"
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
