@@ -170,15 +170,15 @@ services:
       - 5055
     labels:
       - traefik.enable=true
-      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`)"
+      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`) || Host(`requests.{{ local_domain }}`)"
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
     restart: unless-stopped
 
   profilarr:
     image: santiagosayshey/profilarr:v1.1.3
     container_name: profilarr
-    ports:
-      - 6868:6868
+    expose:
+      - 6868
     labels:
       - traefik.enable=true
       - "traefik.http.routers.profilarr.rule=Host(`profilarr.{{ local_domain }}`)"
@@ -189,3 +189,46 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr:release-1.5.3
+    container_name: bazarr
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`bazarr.{{ local_domain }}`)"
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+    expose:
+      - 6767
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - "UMASK=002"
+      - WEBUI_PORTS=6767/tcp,6767/udp
+    volumes:
+      - "{{ appdata_path }}/bazarr/config:/config"
+      - "{{ media_dataset_path }}:/data"
+      - /etc/localtime:/etc/localtime:ro
+
+  ersatztv:
+    image: ghcr.io/ersatztv/ersatztv:v25.8.0
+    container_name: ersatztv
+    expose:
+      - 8409
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.ersatztv.rule=Host(`ersatztv.{{ local_domain }}`)"
+    volumes:
+      - "{{ appdata_path }}/ersatztv/config:/config"
+      - "{{ media_dataset_path }}:/media:ro"
+    devices:
+      - /dev/dri:/dev/dri
+    tmpfs:
+      - /transcode
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+    
+
