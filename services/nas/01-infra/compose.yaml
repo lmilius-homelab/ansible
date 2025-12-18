@@ -64,3 +64,47 @@ services:
       - "PUID={{ docker_compose_generator_uid }}"
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
+
+  gitea:
+    image: docker.io/gitea/gitea:1.25.0
+    container_name: gitea
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.gitea.rule=Host(`git.{{ local_domain }}`)"
+      - traefik.http.services.gitea.loadbalancer.server.port=3000
+    environment:
+      - GITEA__database__DB_TYPE=mysql
+      - GITEA__database__HOST=giteadb:3306
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - "GITEA__database__PASSWD={{ nas.gitea.user_db_pass }}"
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+    volumes:
+      - "{{ appdata_path }}/gitea/config:/etc/gitea"
+      - "{{ appdata_path }}/gitea/data:/var/lib/gitea"
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - 3000
+    ports:
+      - "2222:2222"
+    depends_on:
+      - giteadb
+
+  giteadb:
+    image: docker.io/library/mysql:8
+    container_name: giteadb
+    restart: unless-stopped
+    environment:
+      - "MYSQL_ROOT_PASSWORD={{ nas.gitea.root_db_pass }}"
+      - MYSQL_USER=gitea
+      - "MYSQL_PASSWORD={{ nas.gitea.user_db_pass }}"
+      - MYSQL_DATABASE=gitea
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/gitea/mysql:/var/lib/mysql"

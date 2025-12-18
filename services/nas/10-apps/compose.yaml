@@ -16,92 +16,92 @@ services:
       - "{{ appdata_path }}/mealie/data:/app/data"
     restart: unless-stopped
 
-  ytdl_material:
-    image: tzahi12345/youtubedl-material:nightly-2024-12-31
-    container_name: ytdl_material
-    environment:
-      - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
-      - ytdl_use_local_db=false
-      - write_ytdl_config=true
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    restart: "unless-stopped"
-    volumes:
-      - "{{ appdata_path }}/ytdl/appdata:/app/appdata"
-      - "{{ appdata_path }}/ytdl/audio:/app/audio"
-      - "{{ media_path }}videos/videos:/app/video"
-      - "{{ media_path }}videos/subscriptions:/app/subscriptions"
-      - "{{ appdata_path }}/ytdl/users:/app/users"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.ytdl.rule=Host(`tube-dl.{{ local_domain }}`)
-      - traefik.http.services.ytdl.loadbalancer.server.port=17442
-    depends_on:
-      - ytdl_mongodb
+  # ytdl_material:
+  #   image: tzahi12345/youtubedl-material:nightly-2024-12-31
+  #   container_name: ytdl_material
+  #   environment:
+  #     - ytdl_mongodb_connection_string=mongodb://ytdl_mongodb:27017
+  #     - ytdl_use_local_db=false
+  #     - write_ytdl_config=true
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #   restart: "unless-stopped"
+  #   volumes:
+  #     - "{{ appdata_path }}/ytdl/appdata:/app/appdata"
+  #     - "{{ appdata_path }}/ytdl/audio:/app/audio"
+  #     - "{{ media_path }}videos/videos:/app/video"
+  #     - "{{ media_path }}videos/subscriptions:/app/subscriptions"
+  #     - "{{ appdata_path }}/ytdl/users:/app/users"
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.ytdl.rule=Host(`tube-dl.{{ local_domain }}`)
+  #     - traefik.http.services.ytdl.loadbalancer.server.port=17442
+  #   depends_on:
+  #     - ytdl_mongodb
 
-  ytdl_mongodb:
-    image: mongo:4
-    container_name: ytdl_mongodb
-    logging:
-      driver: "none"
-    restart: "unless-stopped"
-    volumes:
-      - "{{ appdata_path }}/ytdl/db:/data/db"
+  # ytdl_mongodb:
+  #   image: mongo:4
+  #   container_name: ytdl_mongodb
+  #   logging:
+  #     driver: "none"
+  #   restart: "unless-stopped"
+  #   volumes:
+  #     - "{{ appdata_path }}/ytdl/db:/data/db"
 
-  handbrake:
-    privileged: true
-    image: jlesage/handbrake:v24.12.1
-    container_name: handbrake
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
-      - traefik.http.services.handbrake.loadbalancer.server.port=5800
-    volumes:
-      - "{{ appdata_path }}/handbrake/config:/config"
-      - "{{ media_path }}movies:/storage/movies"
-      - "{{ media_path }}videos:/storage/videos"
-      - "{{ media_path }}tvshows:/storage/tvshows"
-    devices:  
-      - /dev/dri:/dev/dri
-    restart: "unless-stopped"
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # handbrake:
+  #   privileged: true
+  #   image: jlesage/handbrake:v24.12.1
+  #   container_name: handbrake
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.handbrake.rule=Host(`handbrake.{{ local_domain }}`)
+  #     - traefik.http.services.handbrake.loadbalancer.server.port=5800
+  #   volumes:
+  #     - "{{ appdata_path }}/handbrake/config:/config"
+  #     - "{{ media_path }}movies:/storage/movies"
+  #     - "{{ media_path }}videos:/storage/videos"
+  #     - "{{ media_path }}tvshows:/storage/tvshows"
+  #   devices:  
+  #     - /dev/dri:/dev/dri
+  #   restart: "unless-stopped"
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
-  archivebox:
-    image: archivebox/archivebox:0.8.5rc51
-    container_name: archivebox
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
-      - traefik.http.services.archivebox.loadbalancer.server.port=8000
-    volumes:
-      - "{{ appdata_path }}/archivebox/data:/data"
-    environment:
-      - SAVE_ARCHIVE_DOT_ORG=FALSE
-      - "CSRF_TRUSTED_ORIGINS=https://archivebox.{{ local_domain }}"
-      - PUBLIC_ADD_VIEW=True
-      - ADMIN_USERNAME=admin
-      - "ADMIN_PASSWORD={{ init_admin_pass }}"
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # archivebox:
+  #   image: archivebox/archivebox:0.8.5rc51
+  #   container_name: archivebox
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.archivebox.rule=Host(`archivebox.{{ local_domain }}`)
+  #     - traefik.http.services.archivebox.loadbalancer.server.port=8000
+  #   volumes:
+  #     - "{{ appdata_path }}/archivebox/data:/data"
+  #   environment:
+  #     - SAVE_ARCHIVE_DOT_ORG=FALSE
+  #     - "CSRF_TRUSTED_ORIGINS=https://archivebox.{{ local_domain }}"
+  #     - PUBLIC_ADD_VIEW=True
+  #     - ADMIN_USERNAME=admin
+  #     - "ADMIN_PASSWORD={{ init_admin_pass }}"
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
-  metube:
-    image: ghcr.io/alexta69/metube
-    container_name: metube
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
-      - traefik.http.services.metube.loadbalancer.server.port=8081
-    volumes:
-      - "{{ media_path }}videos/metube:/downloads"
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # metube:
+  #   image: ghcr.io/alexta69/metube
+  #   container_name: metube
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.metube.rule=Host(`metube.{{ local_domain }}`)
+  #     - traefik.http.services.metube.loadbalancer.server.port=8081
+  #   volumes:
+  #     - "{{ media_path }}videos/metube:/downloads"
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
   joplin:
     image: joplin/server:3.4.3
@@ -271,23 +271,23 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
 
-  silver_bullet:
-    image: ghcr.io/silverbulletmd/silverbullet:2.2.1
-    container_name: silver_bullet
-    restart: unless-stopped
-    volumes:
-      - "{{ appdata_path }}/silverbullet/space:/space"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.silverbullet.rule=Host(`silverbullet.{{ local_domain }}`)"
-    environment:
-      - "SB_USER=lmilius:{{ init_admin_pass }}"
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # silver_bullet:
+  #   image: ghcr.io/silverbulletmd/silverbullet:2.2.1
+  #   container_name: silver_bullet
+  #   restart: unless-stopped
+  #   volumes:
+  #     - "{{ appdata_path }}/silverbullet/space:/space"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.silverbullet.rule=Host(`silverbullet.{{ local_domain }}`)"
+  #   environment:
+  #     - "SB_USER=lmilius:{{ init_admin_pass }}"
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
   beszel:
-    image: henrygd/beszel:0.15.4
+    image: henrygd/beszel:0.17.0
     container_name: beszel
     restart: unless-stopped
     volumes:
@@ -302,7 +302,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   beszel_agent:
-    image: henrygd/beszel-agent:0.15.4
+    image: henrygd/beszel-agent:0.17.0
     container_name: beszel_agent
     restart: unless-stopped
     network_mode: host
@@ -319,24 +319,24 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
 
-  orcaslicer:
-    image: lscr.io/linuxserver/orcaslicer:v2.3.1-ls104
-    container_name: orcaslicer
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.orcaslicer.rule=Host(`orca.{{ local_domain }}`)"
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    volumes:
-      - "{{ appdata_path }}/orcaslicer/config:/config"
-    devices:
-      - /dev/dri:/dev/dri
-    expose:
-      - 3000
-    shm_size: "1gb" #optional
-    restart: unless-stopped
+  # orcaslicer:
+  #   image: lscr.io/linuxserver/orcaslicer:v2.3.1-ls104
+  #   container_name: orcaslicer
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.orcaslicer.rule=Host(`orca.{{ local_domain }}`)"
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #   volumes:
+  #     - "{{ appdata_path }}/orcaslicer/config:/config"
+  #   devices:
+  #     - /dev/dri:/dev/dri
+  #   expose:
+  #     - 3000
+  #   shm_size: "1gb" #optional
+  #   restart: unless-stopped
 
   # borgwarehouse:
   #   image: borgwarehouse/borgwarehouse:v3.1.1

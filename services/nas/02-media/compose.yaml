@@ -190,25 +190,39 @@ services:
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
 
-  bazarr:
-    image: ghcr.io/hotio/bazarr:release-1.5.3
-    container_name: bazarr
+  checkrr:
+    image: aetaric/checkrr:3.5.4
+    container_name: checkrr
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.rule=Host(`bazarr.{{ local_domain }}`)"
-      - traefik.http.services.bazarr.loadbalancer.server.port=6767
-    expose:
-      - 6767
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-      - "UMASK=002"
-      - WEBUI_PORTS=6767/tcp,6767/udp
+      - "traefik.http.routers.checkrr.rule=Host(`checkrr.{{ local_domain }}`)"
     volumes:
-      - "{{ appdata_path }}/bazarr/config:/config"
-      - "{{ media_dataset_path }}:/data"
-      - /etc/localtime:/etc/localtime:ro
+      - "{{ appdata_path }}/checkrr/config/checkrr.yaml:/etc/checkrr.yaml"
+      - "{{ appdata_path }}/checkrr/config/checkrr.db:/checkrr.db"
+      - "{{ media_dataset_path }}:/media"
+    expose:
+      - 8585
+    restart: unless-stopped
+
+  # bazarr:
+  #   image: ghcr.io/hotio/bazarr:release-1.5.3
+  #   container_name: bazarr
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.bazarr.rule=Host(`bazarr.{{ local_domain }}`)"
+  #     - traefik.http.services.bazarr.loadbalancer.server.port=6767
+  #   expose:
+  #     - 6767
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #     - "UMASK=002"
+  #     - WEBUI_PORTS=6767/tcp,6767/udp
+  #   volumes:
+  #     - "{{ appdata_path }}/bazarr/config:/config"
+  #     - "{{ media_dataset_path }}:/data"
+  #     - /etc/localtime:/etc/localtime:ro
 
   ersatztv:
     image: ghcr.io/ersatztv/ersatztv:v25.8.0
@@ -230,5 +244,31 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
+
+  kptv:
+    container_name: kptv
+    image: ghcr.io/kpirnie/kptv-fast:latest
+    expose:
+      - 7777
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.kptv.rule=Host(`kptv.{{ local_domain }}`)"
+    environment:
+      - DEBUG=false
+      - CACHE_DURATION=7200
+      - WARM_CACHE_ON_STARTUP=true
+      - WARM_EPG_ON_STARTUP=true
+      - ENABLED_PROVIDERS=all
+      - GIT_COUNTRY=us,ca,uk,au  # Filter Git providers to these countries
+      - LG_COUNTRY=us,ca,uk,au   # Filter LG provider to these countries
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7777/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     
 
