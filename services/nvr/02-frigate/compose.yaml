@@ -1,7 +1,7 @@
 services:
   frigate:
     privileged: true
-    image: ghcr.io/blakeblackshear/frigate:0.16.2
+    image: ghcr.io/blakeblackshear/frigate:0.16.3
     container_name: frigate
     shm_size: 256m
     labels:

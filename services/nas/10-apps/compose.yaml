@@ -302,7 +302,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   beszel_agent:
-    image: henrygd/beszel-agent:0.17.0
+    image: henrygd/beszel-agent:0.17.0-alpine
     container_name: beszel_agent
     restart: unless-stopped
     network_mode: host
@@ -310,6 +310,18 @@ services:
       - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
       - "{{ appdata_path }}/beszel/socket:/beszel_socket"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    devices:
+      - /dev/sda:/dev/sda
+      - /dev/sdb:/dev/sdb
+      - /dev/sdc:/dev/sdc
+      - /dev/sdd:/dev/sdd
+      - /dev/sde:/dev/sde
+      - /dev/sdf:/dev/sdf
+      - /dev/sdg:/dev/sdg
+      - /dev/nvme0:/dev/nvme0
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
     environment:
       - "LISTEN=/beszel_socket/beszel.sock"
       - "HUB_URL=https://beszel.{{ local_domain }}"
