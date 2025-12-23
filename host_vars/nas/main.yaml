@@ -65,7 +65,7 @@ photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
-immich_release_version: "v2.0.1"
+immich_release_version: "v2.4.1"
 immich_dir: "{{ zfs_path }}/immich"
 immich_db_password: "{{ vault_immich_db_password }}"
 
