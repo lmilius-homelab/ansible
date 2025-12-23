@@ -1,7 +1,6 @@
 ---
 
 ansible_user: deployer
-become: true
 main_uid: "1100"
 main_gid: "1100"
 

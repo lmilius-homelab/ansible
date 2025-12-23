@@ -23,6 +23,7 @@
               just
               ansible
               bitwarden-cli
+              python314
             ];
             shellHook = ''
               ansible-galaxy install -r requirements.yaml
