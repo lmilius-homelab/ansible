@@ -12,9 +12,9 @@ services:
       - "{{ appdata_path }}/jellyfin:/config"
       - "{{ media_dataset_path }}:/media"
       - "{{ media_path }}books:/data/books"
-      - "{{ media_path }}movies:/data/movies"
-      - "{{ media_path }}tvshows:/data/tvshows"
-      - "{{ media_path }}videos:/data/videos"
+      # - "{{ media_path }}movies:/data/movies"
+      # - "{{ media_path }}tvshows:/data/tvshows"
+      # - "{{ media_path }}videos:/data/videos"
     environment:
       - "JELLYFIN_PublishedServerUrl=jellyfin.{{ local_domain }}"
       - "PUID={{ docker_compose_generator_uid }}"
