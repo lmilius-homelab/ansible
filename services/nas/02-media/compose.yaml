@@ -155,9 +155,9 @@ services:
       - "{{ appdata_path }}/pinchflat/config:/config"
       - "{{ media_dataset_path }}/videos:/downloads"
 
-  jellyseerr:
-    image: ghcr.io/fallenbagel/jellyseerr:v2.7.3
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/hotio/seerr:release-2.7.3
+    container_name: seerr
     environment:
       - LOG_LEVEL=debug
       - PORT=5055
@@ -170,7 +170,7 @@ services:
       - 5055
     labels:
       - traefik.enable=true
-      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`) || Host(`requests.{{ local_domain }}`)"
+      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`) || Host(`requests.{{ local_domain }}`) || Host(`seerr.{{ local_domain }}`)"
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
     restart: unless-stopped
     healthcheck:
