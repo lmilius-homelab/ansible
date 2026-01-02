@@ -173,12 +173,12 @@ services:
       - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ local_domain }}`) || Host(`requests.{{ local_domain }}`) || Host(`seerr.{{ local_domain }}`)"
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
     restart: unless-stopped
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
-      start_period: 20s
-      timeout: 3s
-      interval: 15s
-      retries: 3
+    # healthcheck:
+    #   test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+    #   start_period: 20s
+    #   timeout: 3s
+    #   interval: 15s
+    #   retries: 3
 
   profilarr:
     image: santiagosayshey/profilarr:v1.1.3
