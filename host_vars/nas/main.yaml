@@ -27,13 +27,13 @@ traefik_config_filepath: "{{ appdata_path }}/traefik"
 crowdsec_lapi_key: "{{ vault_crowdsec_lapi_key }}"
 
 zfs_path: /tank2
-nvr_path: "{{ zfs_path }}/nvr"
 
 domain_name: "{{ vault_domain_name }}"
 local_domain: "{{ domain_name }}"
 
 # ironicbadger.docker_compose_generator
-appdata_path: "{{ zfs_path }}/appdata"
+# appdata_path: "{{ zfs_path }}/appdata"
+appdata_path: "/home/deployer/appdata"
 ntp_timezone: "America/Chicago"
 # global_env_vars:
 #   - "PUID={{ main_uid }}"
@@ -48,7 +48,7 @@ media_dataset_path: "{{ zfs_path }}/media"
 storage_path: "{{ zfs_path }}/archives"
 photoprism_dir: "{{ zfs_path }}/photoprism"
 photoprism_important: "{{ zfs_path }}/media_photos/Important"
-photoprism_compose_output_path: /home/deployer/photoprism
+# photoprism_compose_output_path: /home/deployer/photoprism
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
