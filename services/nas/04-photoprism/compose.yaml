@@ -12,7 +12,7 @@ services:
   # To search originals for faces without a complete rescan:
   # docker-compose exec photoprism photoprism faces index
   photoprism:
-    image: photoprism/photoprism:240915
+    image: photoprism/photoprism:251130
     container_name: photoprism
     depends_on:
       - photoprism_mariadb
