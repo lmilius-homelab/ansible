@@ -48,22 +48,26 @@ services:
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
-  
-  portainer:
+
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:v1.13.2
     restart: unless-stopped
-    image: portainer/portainer-ce:2.35.0
-    container_name: portainer
+    container_name: arcane
     labels:
       - traefik.enable=true
-      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ local_domain }}`)"
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - "traefik.http.routers.arcane.rule=Host(`arcane.{{ local_domain }}`)"
+      - traefik.http.services.arcane.loadbalancer.server.port=3552
     volumes:
-      - "{{ appdata_path }}/portainer/data:/data"
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ appdata_path }}/arcane/data:/app/data"
     environment:
+      - "APP_URL=arcane.{{ local_domain }}"
       - "PUID={{ docker_compose_generator_uid }}"
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
+      - "ENCRYPTION_KEY={{ nas.arcane.enc_key }}"
+      - "JWT_SECRET={{ nas.arcane.jwt_secret }}"
+      - DATABASE_URL=file:data/arcane.db?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2500)&_txlock=immediate
 
   gitea:
     image: docker.io/gitea/gitea:1.25.0
