@@ -1,6 +1,6 @@
 services:
   influxdb:
-    image: influxdb:2.7
+    image: influxdb:2.8
     container_name: influxdb
     environment:
       - MODE=standalone
