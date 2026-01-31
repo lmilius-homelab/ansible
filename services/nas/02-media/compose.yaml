@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   ombi:
-    image: lscr.io/linuxserver/ombi:4.47.1
+    image: lscr.io/linuxserver/ombi:4.53.4
     container_name: ombi
     environment:
       - "PUID={{ docker_compose_generator_uid }}"
