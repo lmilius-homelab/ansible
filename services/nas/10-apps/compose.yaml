@@ -333,7 +333,7 @@ services:
 
   # docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
   openwebui:
-    image: ghcr.io/open-webui/open-webui
+    image: ghcr.io/open-webui/open-webui:v0.7.2
     container_name: openwebui
     labels:
       - "traefik.enable=true"
