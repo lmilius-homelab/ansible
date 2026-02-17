@@ -353,3 +353,34 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     - "traefik.http.routers.apprise.rule=Host(`apprise.{{ local_domain }}`)"
+
+  actual_budget:
+    container_name: actual_budget
+    image: docker.io/actualbudget/actual-server:26.2.0
+    expose:
+      - 5006
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.actual_budget.rule=Host(`budget.{{ local_domain }}`)"
+      - traefik.http.services.actual_budget.loadbalancer.server.port=5006
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      # - ACTUAL_UPLOAD_FILE_SYNC_SIZE_LIMIT_MB=20
+      # - ACTUAL_UPLOAD_SYNC_ENCRYPTED_FILE_SYNC_SIZE_LIMIT_MB=50
+      # - ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB=20
+      # See all options and more details at https://actualbudget.org/docs/config/
+      # !! If you are not using any of these options, remove the 'environment:' tag entirely.
+    volumes:
+      # Change './actual-data' below to the path to the folder you want Actual to store its data in on your server.
+      # '/data' is the path Actual will look for its files in by default, so leave that as-is.
+      - "{{ appdata_path }}/actualbudget/data:/data"
+    healthcheck:
+      # Enable health check for the instance
+      test: ['CMD-SHELL', 'node src/scripts/health-check.js']
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
