@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
 
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:v1.13.2
+    image: ghcr.io/getarcaneapp/arcane:v1.15.2
     restart: unless-stopped
     container_name: arcane
     labels:
