@@ -33,7 +33,7 @@ services:
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
   beszel_agent:
-    image: henrygd/beszel-agent:0.18.3-alpine
+    image: henrygd/beszel-agent:0.18.4-alpine
     container_name: beszel_agent
     restart: unless-stopped
     network_mode: host
