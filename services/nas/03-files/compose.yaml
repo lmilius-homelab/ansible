@@ -13,4 +13,5 @@ services:
       - "PUID={{ docker_compose_generator_uid }}"
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
+    user: "{{ docker_compose_generator_uid }}:{{ docker_compose_generator_gid }}"
     restart: unless-stopped
