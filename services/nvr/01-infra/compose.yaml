@@ -41,6 +41,7 @@ services:
       - "{{ appdata_path }}/beszel/agent_data:/var/lib/beszel-agent"
       - "{{ appdata_path }}/beszel/socket:/beszel_socket"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     devices:
       - /dev/sda:/dev/sda
       - /dev/nvme0:/dev/nvme0
