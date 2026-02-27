@@ -231,7 +231,7 @@ services:
   #     - /etc/localtime:/etc/localtime:ro
 
   ersatztv:
-    image: ghcr.io/ersatztv/ersatztv:v26.1.1
+    image: ghcr.io/ersatztv/ersatztv:v26.3.0
     container_name: ersatztv
     expose:
       - 8409
