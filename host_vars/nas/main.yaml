@@ -52,6 +52,6 @@ photoprism_important: "{{ zfs_path }}/media_photos/Important"
 backup_drive: "/mnt/backups/BACKUPS"
 
 # immich
-immich_release_version: "v2.4.1"
+immich_release_version: "v2.5.6"
 immich_dir: "{{ zfs_path }}/immich"
 immich_db_password: "{{ vault_immich_db_password }}"

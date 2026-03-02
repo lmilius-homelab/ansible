@@ -26,6 +26,7 @@ services:
       - "PUID={{ docker_compose_generator_uid }}"
       - "PGID={{ docker_compose_generator_gid }}"
       - "TZ={{ ntp_timezone }}"
+      - IMMICH_ALLOW_SETUP=false
   
   ###
   immich_ml:
