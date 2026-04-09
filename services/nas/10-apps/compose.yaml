@@ -50,7 +50,7 @@ services:
   #     - "TZ={{ ntp_timezone }}"
 
   joplin:
-    image: joplin/server:3.4.3
+    image: joplin/server:3.5.2
     container_name: joplin
     labels:
       - traefik.enable=true
