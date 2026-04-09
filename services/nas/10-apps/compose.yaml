@@ -403,6 +403,7 @@ services:
     image: ghcr.io/wavelog/wavelog:2.4.1
     depends_on:
       - wavelog-db
+    user: "{{ docker_compose_generator_uid }}:{{ docker_compose_generator_gid }}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wavelog.rule=Host(`hamlog.{{ local_domain }}`)"
