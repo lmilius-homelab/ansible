@@ -1,4 +1,4 @@
-source unlock_bw.sh
+# source unlock_bw.sh
 
 ansible-vault view vars/ssh_key > ~/.ssh/ansible_key
 ansible-vault view vars/ssh_key_ed25519 > ~/.ssh/ansible_key_ed25519

@@ -8,6 +8,7 @@
 - src: rossmcdonald.telegraf
 - src: ironicbadger.bash_aliases
 - src: ironicbadger.docker_compose_generator
+  version: v2.1.1
 # - name: ironicbadger.apprise_boot_notification
 #   src: https://github.com/lmilius-homelab/ansible-role-apprise-boot-notification.git
 - name: udelarinterior.proxmox_create_lxc
