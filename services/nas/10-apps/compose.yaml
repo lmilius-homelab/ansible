@@ -50,7 +50,7 @@ services:
   #     - "TZ={{ ntp_timezone }}"
 
   joplin:
-    image: joplin/server:3.4.3
+    image: joplin/server:3.6.16
     container_name: joplin
     labels:
       - traefik.enable=true
@@ -144,7 +144,7 @@ services:
     restart: "unless-stopped"
 
   heimdall:
-    image: lscr.io/linuxserver/heimdall:2.7.6
+    image: lscr.io/linuxserver/heimdall:2.8.2
     container_name: heimdall
     volumes:
       - "{{ appdata_path }}/heimdall/config:/config"
@@ -157,49 +157,49 @@ services:
       - "TZ={{ ntp_timezone }}"
     restart: unless-stopped
 
-  linkwarden_db:
-    image: postgres:16-alpine
-    container_name: linkwarden_db
-    volumes:
-      - "{{ appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data"
-    restart: unless-stopped
-    environment:
-      - "POSTGRES_PASSWORD={{ vault_linkwarden_db_pass }}"
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # linkwarden_db:
+  #   image: postgres:16-alpine
+  #   container_name: linkwarden_db
+  #   volumes:
+  #     - "{{ appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data"
+  #   restart: unless-stopped
+  #   environment:
+  #     - "POSTGRES_PASSWORD={{ vault_linkwarden_db_pass }}"
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
-  linkwarden:
-    image: ghcr.io/linkwarden/linkwarden:v2.13.5
-    container_name: linkwarden
-    volumes:
-      - "{{ appdata_path }}/linkwarden/data:/data/data"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.linkwarden.rule=Host(`links.{{ local_domain }}`)"
-    environment:
-      - "DATABASE_URL=postgresql://postgres:{{ vault_linkwarden_db_pass }}@linkwarden_db:5432/postgres"
-      - "NEXTAUTH_SECRET={{ vault_linkwarden_secret_key }}"
-      - "MEILI_HOST=linkwarden_search"
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    restart: unless-stopped
+  # linkwarden:
+  #   image: ghcr.io/linkwarden/linkwarden:v2.13.5
+  #   container_name: linkwarden
+  #   volumes:
+  #     - "{{ appdata_path }}/linkwarden/data:/data/data"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.linkwarden.rule=Host(`links.{{ local_domain }}`)"
+  #   environment:
+  #     - "DATABASE_URL=postgresql://postgres:{{ vault_linkwarden_db_pass }}@linkwarden_db:5432/postgres"
+  #     - "NEXTAUTH_SECRET={{ vault_linkwarden_secret_key }}"
+  #     - "MEILI_HOST=linkwarden_search"
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #   restart: unless-stopped
 
-  linkwarden_search:
-    image: getmeili/meilisearch:v1.24.0
-    container_name: linkwarden_search
-    restart: unless-stopped
-    volumes:
-      - "{{ appdata_path }}/linkwarden/meili_data:/meili_data"
-    environment:
-      - "MEILI_MASTER_KEY={{ vault_linkwarden_meili_key }}"
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
+  # linkwarden_search:
+  #   image: getmeili/meilisearch:v1.24.0
+  #   container_name: linkwarden_search
+  #   restart: unless-stopped
+  #   volumes:
+  #     - "{{ appdata_path }}/linkwarden/meili_data:/meili_data"
+  #   environment:
+  #     - "MEILI_MASTER_KEY={{ vault_linkwarden_meili_key }}"
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
 
   lube_logger:
-    image: ghcr.io/hargata/lubelogger:v1.5.8
+    image: ghcr.io/hargata/lubelogger:v1.7.1
     container_name: lube_logger
     restart: unless-stopped
     volumes:
@@ -233,7 +233,7 @@ services:
   #     - "TZ={{ ntp_timezone }}"
 
   beszel:
-    image: henrygd/beszel:0.18.4
+    image: henrygd/beszel:0.18.8
     container_name: beszel
     restart: unless-stopped
     volumes:
@@ -248,7 +248,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   beszel_agent:
-    image: henrygd/beszel-agent:0.18.4-alpine
+    image: henrygd/beszel-agent:0.18.8-alpine
     container_name: beszel_agent
     restart: unless-stopped
     network_mode: host
@@ -279,7 +279,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   openwebui:
-    image: ghcr.io/open-webui/open-webui:v0.8.3
+    image: ghcr.io/open-webui/open-webui:v0.11.1
     container_name: openwebui
     labels:
       - "traefik.enable=true"
@@ -360,7 +360,7 @@ services:
 
   actual_budget:
     container_name: actual_budget
-    image: docker.io/actualbudget/actual-server:26.2.0
+    image: docker.io/actualbudget/actual-server:26.8.1
     expose:
       - 5006
     labels:
@@ -403,7 +403,7 @@ services:
 
   wavelog-main:
     container_name: wavelog-main
-    image: ghcr.io/wavelog/wavelog:2.4.1
+    image: ghcr.io/wavelog/wavelog:3.1.0
     depends_on:
       - wavelog-db
     user: "{{ docker_compose_generator_uid }}:{{ docker_compose_generator_gid }}"
