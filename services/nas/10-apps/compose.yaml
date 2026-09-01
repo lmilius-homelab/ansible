@@ -279,7 +279,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   openwebui:
-    image: ghcr.io/open-webui/open-webui:v0.11.1
+    image: ghcr.io/open-webui/open-webui:v0.11.3
     container_name: openwebui
     labels:
       - "traefik.enable=true"
