@@ -199,7 +199,7 @@ services:
   #     - "TZ={{ ntp_timezone }}"
 
   lube_logger:
-    image: ghcr.io/hargata/lubelogger:v1.7.1
+    image: ghcr.io/hargata/lubelogger:v1.7.3
     container_name: lube_logger
     restart: unless-stopped
     volumes:
