@@ -37,7 +37,7 @@ services:
   #   restart: unless-stopped
 
   sabnzbd:
-    image: ghcr.io/hotio/sabnzbd:release-5.1.2
+    image: ghcr.io/hotio/sabnzbd:release-5.1.3
     container_name: sabnzbd
     labels:
       - "traefik.enable=true"
@@ -137,23 +137,23 @@ services:
     depends_on:
       - sabnzbd
 
-  pinchflat:
-    image: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
-    container_name: pinchflat
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.pinchflat.rule=Host(`pinchflat.{{ local_domain }}`)"
-      - traefik.http.services.pinchflat.loadbalancer.server.port=8945
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    expose:
-      - 8945
-    restart: unless-stopped
-    volumes:
-      - "{{ appdata_path }}/pinchflat/config:/config"
-      - "{{ media_dataset_path }}/videos:/downloads"
+  # pinchflat:
+  #   image: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
+  #   container_name: pinchflat
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.pinchflat.rule=Host(`pinchflat.{{ local_domain }}`)"
+  #     - traefik.http.services.pinchflat.loadbalancer.server.port=8945
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #   expose:
+  #     - 8945
+  #   restart: unless-stopped
+  #   volumes:
+  #     - "{{ appdata_path }}/pinchflat/config:/config"
+  #     - "{{ media_dataset_path }}/videos:/downloads"
 
   seerr:
     image: ghcr.io/hotio/seerr:release-3.4.1
