@@ -360,7 +360,7 @@ services:
 
   actual_budget:
     container_name: actual_budget
-    image: docker.io/actualbudget/actual-server:26.8.1
+    image: docker.io/actualbudget/actual-server:26.9.0
     expose:
       - 5006
     labels:
