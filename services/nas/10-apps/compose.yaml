@@ -132,6 +132,25 @@ services:
       - "{{ appdata_path }}/calibre/db:/config"
     restart: "unless-stopped"
 
+  kosync:
+    image: koreader/kosync:v2.1.1
+    container_name: kosync
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kosync.rule=Host(`kosync.{{ local_domain }}`)"
+      - traefik.http.services.kosync.loadbalancer.server.port=17200
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+    volumes:
+      - "{{ appdata_path }}/kosync/logs/app:/app/koreader-sync-server/logs"
+      - "{{ appdata_path }}/kosync/logs/redis:/var/log/redis"
+      - "{{ appdata_path }}/kosync/data/redis:/var/lib/redis"
+    expose:
+      - 17200
+    restart: unless-stopped
+
   kuma:
     image: louislam/uptime-kuma:1.23.17-alpine
     container_name: kuma
