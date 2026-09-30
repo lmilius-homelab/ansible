@@ -137,6 +137,26 @@ services:
     depends_on:
       - sabnzbd
 
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:7fda5070-ls359
+    container_name: lazylibrarian
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lazylibrarian.rule=Host(`lazylibrarian.{{ local_domain }}`)"
+      - traefik.http.services.lazylibrarian.loadbalancer.server.port=5299
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
+    volumes:
+      - "{{ appdata_path }}/lazylibrarian/config:/config"
+      - "{{ media_dataset_path }}/usenet:/downloads"
+      - "{{ media_path }}books:/books"
+    expose:
+      - 5299
+    restart: unless-stopped
+
   # pinchflat:
   #   image: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
   #   container_name: pinchflat
