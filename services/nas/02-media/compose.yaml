@@ -142,7 +142,7 @@ services:
     container_name: lazylibrarian
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.lazylibrarian.rule=Host(`lazylibrarian.{{ local_domain }}`)"
+      - "traefik.http.routers.lazylibrarian.rule=Host(`lazylibrarian.{{ local_domain }}`) || Host(`lazylib.{{ local_domain }}`)"
       - traefik.http.services.lazylibrarian.loadbalancer.server.port=5299
     environment:
       - "PUID={{ docker_compose_generator_uid }}"
@@ -156,6 +156,51 @@ services:
     expose:
       - 5299
     restart: unless-stopped
+    depends_on:
+      - sabnzbd
+
+    
+  shelfmark:
+    image: ghcr.io/calibrain/shelfmark:v1.4.0
+    container_name: shelfmark
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.shelfmark.rule=Host(`shelfmark.{{ local_domain }}`)"
+      - traefik.http.services.shelfmark.loadbalancer.server.port=8084
+    environment:
+      FLASK_PORT: 8084
+      # Quoted so it is passed as the literal string "true": entrypoint.sh compares
+      # $USING_WIREGUARD against "true", and some Compose implementations stringify
+      # a bare YAML boolean as "True", which would silently NOT enable WireGuard.
+      USING_WIREGUARD: "true"
+      # Path to the mounted wg-quick config (default shown).
+      WIREGUARD_CONFIG: /config/wg0.conf
+      # CIDRs kept OFF the tunnel so the WebUI and internal clients stay reachable.
+      LAN_NETWORK: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+      PUID: "{{ docker_compose_generator_uid }}"
+      PGID: "{{ docker_compose_generator_gid }}"
+      TZ: "{{ ntp_timezone }}"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    # WireGuard needs the module/kernel routing; NET_ADMIN covers wg-quick.
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      # Disable IPv6 in the container so the kill-switch can guarantee no IPv6
+      # leak path on kernels/containers without a usable ip6tables. wireguard.sh
+      # fails closed if IPv6 is neither kill-switched nor disabled. If your host
+      # DOES have a working ip6tables you may omit these (an ip6tables kill-switch
+      # is installed instead); or set WIREGUARD_ALLOW_IPV6_LEAK=true only if the
+      # container genuinely has no IPv6 connectivity.
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+    expose:
+      - 8084
+    restart: unless-stopped
+    volumes:
+      - "{{ media_path }}books:/books"
+      - "{{ appdata_path }}/shelfmark/config:/config"
+      - "{{ media_dataset_path }}/usenet:/downloads"
 
   # pinchflat:
   #   image: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202
