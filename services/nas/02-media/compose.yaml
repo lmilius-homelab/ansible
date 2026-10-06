@@ -137,29 +137,28 @@ services:
     depends_on:
       - sabnzbd
 
-  lazylibrarian:
-    image: lscr.io/linuxserver/lazylibrarian:7fda5070-ls359
-    container_name: lazylibrarian
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lazylibrarian.rule=Host(`lazylibrarian.{{ local_domain }}`) || Host(`lazylib.{{ local_domain }}`)"
-      - traefik.http.services.lazylibrarian.loadbalancer.server.port=5299
-    environment:
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-      - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
-    volumes:
-      - "{{ appdata_path }}/lazylibrarian/config:/config"
-      - "{{ media_dataset_path }}/usenet:/downloads"
-      - "{{ media_path }}books:/books"
-    expose:
-      - 5299
-    restart: unless-stopped
-    depends_on:
-      - sabnzbd
+  # lazylibrarian:
+  #   image: lscr.io/linuxserver/lazylibrarian:7fda5070-ls359
+  #   container_name: lazylibrarian
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.lazylibrarian.rule=Host(`lazylibrarian.{{ local_domain }}`) || Host(`lazylib.{{ local_domain }}`)"
+  #     - traefik.http.services.lazylibrarian.loadbalancer.server.port=5299
+  #   environment:
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #     - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
+  #   volumes:
+  #     - "{{ appdata_path }}/lazylibrarian/config:/config"
+  #     - "{{ media_dataset_path }}/usenet:/downloads"
+  #     - "{{ media_path }}books:/books"
+  #   expose:
+  #     - 5299
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - sabnzbd
 
-    
   shelfmark:
     image: ghcr.io/calibrain/shelfmark:v1.4.0
     container_name: shelfmark
@@ -167,12 +166,19 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.shelfmark.rule=Host(`shelfmark.{{ local_domain }}`)"
       - traefik.http.services.shelfmark.loadbalancer.server.port=8084
+    command:
+      - /bin/bash
+      - -ec
+      - |
+        update-alternatives --set iptables /usr/sbin/iptables-nft
+        iptables --version
+        exec /app/entrypoint.sh
     environment:
       FLASK_PORT: 8084
       # Quoted so it is passed as the literal string "true": entrypoint.sh compares
       # $USING_WIREGUARD against "true", and some Compose implementations stringify
       # a bare YAML boolean as "True", which would silently NOT enable WireGuard.
-      USING_WIREGUARD: "true"
+      # USING_WIREGUARD: "true"
       # Path to the mounted wg-quick config (default shown).
       WIREGUARD_CONFIG: /config/wg0.conf
       # CIDRs kept OFF the tunnel so the WebUI and internal clients stay reachable.
@@ -194,6 +200,7 @@ services:
       # container genuinely has no IPv6 connectivity.
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.default.disable_ipv6=1
+    # dns: 10.2.0.1
     expose:
       - 8084
     restart: unless-stopped
@@ -201,6 +208,27 @@ services:
       - "{{ media_path }}books:/books"
       - "{{ appdata_path }}/shelfmark/config:/config"
       - "{{ media_dataset_path }}/usenet:/downloads"
+      - "{{ appdata_path }}/calibre/db/Calibre Library/metadata.db:/calibre-library/metadata.db:ro"
+
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:v4.0.8
+    container_name: calibre-web-automated
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-web-automated.rule=Host(`books.{{ local_domain }}`)"
+      - traefik.http.services.calibre-web-automated.loadbalancer.server.port=8083
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - "HARDCOVER_TOKEN={{ nas.calibre_web_automated.hardcover_token }}"
+    expose:
+      - 8083
+    volumes:
+      - "{{ appdata_path }}/calibre-web-automated/config:/config"
+      - "{{ media_dataset_path }}/books/library:/calibre-library"
+      - "{{ media_dataset_path }}/books/import:/cwa-book-ingest"
+    restart: unless-stopped
 
   # pinchflat:
   #   image: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202

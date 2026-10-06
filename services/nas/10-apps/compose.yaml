@@ -86,23 +86,23 @@ services:
       - "{{ appdata_path }}/joplin/db:/var/lib/postgresql/data"
     restart: "unless-stopped"
 
-  calibre-web:
-    image: lscr.io/linuxserver/calibre-web:0.6.25
-    container_name: calibre-web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.calibre-web.rule=Host(`calibre-web.{{ local_domain }}`)"
-      - traefik.http.services.calibre-web.loadbalancer.server.port=8083
-    environment:
-      - DOCKER_MODS=ghcr.io/linuxserver/mods:universal-calibre
-      # - OAUTHLIB_RELAX_TOKEN_SCOPE=1
-      - "PUID={{ docker_compose_generator_uid }}"
-      - "PGID={{ docker_compose_generator_gid }}"
-      - "TZ={{ ntp_timezone }}"
-    volumes:
-      - "{{ appdata_path }}/calibre/data:/config"
-      - "{{ appdata_path }}/calibre/db:/books"
-    restart: "unless-stopped"
+  # calibre-web:
+  #   image: lscr.io/linuxserver/calibre-web:0.6.25
+  #   container_name: calibre-web
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.calibre-web.rule=Host(`calibre-web.{{ local_domain }}`)"
+  #     - traefik.http.services.calibre-web.loadbalancer.server.port=8083
+  #   environment:
+  #     - DOCKER_MODS=ghcr.io/linuxserver/mods:universal-calibre
+  #     # - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+  #     - "PUID={{ docker_compose_generator_uid }}"
+  #     - "PGID={{ docker_compose_generator_gid }}"
+  #     - "TZ={{ ntp_timezone }}"
+  #   volumes:
+  #     - "{{ appdata_path }}/calibre/data:/config"
+  #     - "{{ appdata_path }}/calibre/db:/books"
+  #   restart: "unless-stopped"
 
   calibre:
     image: lscr.io/linuxserver/calibre:7.26.0
@@ -112,13 +112,13 @@ services:
       - "traefik.http.routers.calibre.rule=Host(`calibre.{{ local_domain }}`)"
       - "traefik.http.routers.calibre.service=calibre"
       - "traefik.http.services.calibre.loadbalancer.server.port=8080"
-      - "traefik.http.routers.calibrewebserver.rule=Host(`books.{{ local_domain }}`)"
-      - "traefik.http.routers.calibrewebserver.service=calibrewebserver"
-      - "traefik.http.services.calibrewebserver.loadbalancer.server.port=8081"
-      - "traefik.http.routers.calibreunsecureopds.rule=Host(`book.{{ local_domain }}`)"
-      - "traefik.http.routers.calibreunsecureopds.service=calibreunsecureopds"
-      - "traefik.http.routers.calibreunsecureopds.entrypoints=web"
-      - "traefik.http.services.calibreunsecureopds.loadbalancer.server.port=8081"
+      # - "traefik.http.routers.calibrewebserver.rule=Host(`books.{{ local_domain }}`)"
+      # - "traefik.http.routers.calibrewebserver.service=calibrewebserver"
+      # - "traefik.http.services.calibrewebserver.loadbalancer.server.port=8081"
+      # - "traefik.http.routers.calibreunsecureopds.rule=Host(`book.{{ local_domain }}`)"
+      # - "traefik.http.routers.calibreunsecureopds.service=calibreunsecureopds"
+      # - "traefik.http.routers.calibreunsecureopds.entrypoints=web"
+      # - "traefik.http.services.calibreunsecureopds.loadbalancer.server.port=8081"
     environment:
       - "PASSWORD={{ init_admin_pass }}"
       - "PUID={{ docker_compose_generator_uid }}"
