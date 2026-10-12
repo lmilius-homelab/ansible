@@ -205,10 +205,11 @@ services:
       - 8084
     restart: unless-stopped
     volumes:
-      - "{{ media_path }}books:/books"
       - "{{ appdata_path }}/shelfmark/config:/config"
-      - "{{ media_dataset_path }}/usenet:/downloads"
-      - "{{ appdata_path }}/calibre/db/Calibre Library/metadata.db:/calibre-library/metadata.db:ro"
+      - "{{ media_dataset_path }}/usenet:/data/usenet"
+      - "{{ media_dataset_path }}/books/library/metadata.db:/calibre-library/metadata.db:ro"
+      - "{{ media_dataset_path }}/books/import:/cwa-book-ingest"
+
 
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:v4.0.8
@@ -228,6 +229,7 @@ services:
       - "{{ appdata_path }}/calibre-web-automated/config:/config"
       - "{{ media_dataset_path }}/books/library:/calibre-library"
       - "{{ media_dataset_path }}/books/import:/cwa-book-ingest"
+      - "{{ media_dataset_path }}/books/files:/books"
     restart: unless-stopped
 
   # pinchflat:
