@@ -27,7 +27,7 @@ services:
   nextcloud_mariadb:
     restart: unless-stopped
     image: mariadb:10.6
-    command: --innodb-log-file-size=256M
+    command: --innodb-log-file-size=256M --long-query-time=2.0 --slow-query-log=1
     container_name: nextcloud_mariadb
     volumes:
       - "{{ appdata_path }}/nextcloud/db:/var/lib/mysql"
