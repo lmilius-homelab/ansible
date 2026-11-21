@@ -76,7 +76,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: ghcr.io/hotio/prowlarr:release-2.5.2.5491
+    image: ghcr.io/hotio/prowlarr:release-3.0.2.5780
     container_name: prowlarr
     labels:
       - "traefik.enable=true"
@@ -96,7 +96,7 @@ services:
       - sabnzbd
 
   sonarr:
-    image: ghcr.io/hotio/sonarr:release-4.0.19.2979
+    image: ghcr.io/hotio/sonarr:release-4.0.20.3014
     container_name: sonarr
     labels:
       - "traefik.enable=true"
@@ -117,7 +117,7 @@ services:
       - sabnzbd
 
   radarr:
-    image: ghcr.io/hotio/radarr:release-6.3.0.10514
+    image: ghcr.io/hotio/radarr:release-7.0.3.10918
     container_name: radarr
     labels:
       - "traefik.enable=true"
@@ -160,7 +160,7 @@ services:
   #     - sabnzbd
 
   shelfmark:
-    image: ghcr.io/calibrain/shelfmark:v1.4.0
+    image: ghcr.io/calibrain/shelfmark:v1.7.0
     container_name: shelfmark
     labels:
       - "traefik.enable=true"
@@ -251,7 +251,7 @@ services:
   #     - "{{ media_dataset_path }}/videos:/downloads"
 
   seerr:
-    image: ghcr.io/hotio/seerr:release-3.4.1
+    image: ghcr.io/hotio/seerr:release-3.5.2
     container_name: seerr
     environment:
       - LOG_LEVEL=debug
@@ -275,6 +275,7 @@ services:
     #   interval: 15s
     #   retries: 3
 
+# v2 requires starting over, no migration path from v1. See https://v2.dictionarry.dev/
   profilarr:
     image: santiagosayshey/profilarr:v1.1.5
     container_name: profilarr
