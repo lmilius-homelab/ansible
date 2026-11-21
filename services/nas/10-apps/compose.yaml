@@ -256,7 +256,7 @@ services:
   #     - "TZ={{ ntp_timezone }}"
 
   beszel:
-    image: henrygd/beszel:0.18.8
+    image: henrygd/beszel:0.21.2
     container_name: beszel
     restart: unless-stopped
     volumes:
@@ -271,7 +271,7 @@ services:
       - "TZ={{ ntp_timezone }}"
 
   beszel_agent:
-    image: henrygd/beszel-agent:0.18.8-alpine
+    image: henrygd/beszel-agent:0.21.2-alpine
     container_name: beszel_agent
     restart: unless-stopped
     network_mode: host
