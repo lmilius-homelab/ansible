@@ -50,8 +50,7 @@ services:
     restart: unless-stopped
 
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:v3.1.1
-    restart: unless-stopped
+    image: ghcr.io/getarcaneapp/arcane:v2.17.3
     container_name: arcane
     labels:
       - traefik.enable=true
