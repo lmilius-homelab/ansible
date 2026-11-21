@@ -1,7 +1,7 @@
 services:
   nextcloud:
     restart: unless-stopped
-    image: nextcloud:34.0.6
+    image: nextcloud:35.0.3
     container_name: nextcloud
     depends_on:
       - nextcloud_mariadb
