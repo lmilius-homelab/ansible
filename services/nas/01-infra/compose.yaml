@@ -36,7 +36,7 @@ services:
   #   restart: unless-stopped
 
   librespeed:
-    image: linuxserver/librespeed:6.2.1
+    image: linuxserver/librespeed:6.3.1
     container_name: librespeed
     labels:
       - traefik.enable=true
@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
 
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:v2.10.1
+    image: ghcr.io/getarcaneapp/arcane:v3.1.1
     restart: unless-stopped
     container_name: arcane
     labels:
