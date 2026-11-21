@@ -167,7 +167,7 @@ services:
     restart: "unless-stopped"
 
   heimdall:
-    image: lscr.io/linuxserver/heimdall:2.8.2
+    image: lscr.io/linuxserver/heimdall:2.8.4
     container_name: heimdall
     volumes:
       - "{{ appdata_path }}/heimdall/config:/config"
