@@ -306,6 +306,32 @@ services:
       - 8585
     restart: unless-stopped
 
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:3.09.00
+    container_name: tdarr
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tdarr.rule=Host(`tdarr.{{ local_domain }}`)"
+      - traefik.http.services.tdarr.loadbalancer.server.port=8265
+    environment:
+      - "PUID={{ docker_compose_generator_uid }}"
+      - "PGID={{ docker_compose_generator_gid }}"
+      - "TZ={{ ntp_timezone }}"
+      - inContainer=true
+      - internalNode=true
+      - openBrowser=true
+      - maxLogSizeMB=10
+    volumes:
+      - "{{ appdata_path }}/tdarr/config:/app/configs"
+      - "{{ appdata_path }}/tdarr/logs:/app/logs"
+      - "{{ appdata_path }}/tdarr/server:/app/server"
+      - "{{ media_dataset_path }}:/media"
+    expose:
+      - 8265
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+
   # bazarr:
   #   image: ghcr.io/hotio/bazarr:release-1.5.3
   #   container_name: bazarr
